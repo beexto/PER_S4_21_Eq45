@@ -93,10 +93,6 @@
  */
 // #define ESP32
 
-#ifndef _M5STACK_H_
-  #define _M5STACK_H_
-  
-  #if defined(ESP32)
 
     #include "gitTagVersion.h"
     #include <Arduino.h>
@@ -168,7 +164,4 @@
     extern M5Stack M5;
     #define m5 M5
     #define lcd Lcd
-  #else
-    #error "This library only supports boards with ESP32 processor."
-  #endif
-#endif
+
