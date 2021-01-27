@@ -33,11 +33,14 @@ switch(color)
 }
 }
 
-void trt_couleur()//Passe d'une couleur a l'autre dans l'ordre
+void trt_couleur(int BP)//Passe d'une couleur a l'autre dans l'ordre
 {
+	if(BP==0){
 	color++;
 	if(color>RED){
 		color=WHITE;
 	}
 	else;
+	}
+	else{color=WHITE;}
 }
