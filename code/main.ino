@@ -6,8 +6,15 @@ void setup()
 {
 M5.begin();
 M5.Power.begin();
+enum{
+	WHITE,
+	GREEN,
+	BLUE,
+	RED
+	}
+int color = WHITE;
 M5.Lcd.fillScreen(WHITE);
-Color==uint8_t;
+
 }
 
 void loop()
@@ -15,7 +22,13 @@ void loop()
 
 }
 
-void Sel_Couleur()
+void act_couleur(int couleur)
 {
-	
+switch(couleur)
+{
+	case WHITE : M5.Lcd.fillScreen(WHITE); break;
+	case GREEN : M5.Lcd.fillScreen(GREEN); break;
+	case BLUE : M5.Lcd.fillScreen(BLUE); break;
+	case RED : M5.Lcd.fillScreen(RED); break;
+}
 }
