@@ -19,12 +19,12 @@ M5.Lcd.fillScreen(WHITE);
 
 void loop()
 {
-
+act_couleur();
 }
 
-void act_couleur(int couleur)
+void act_couleur()//Rempli l'écran de la couleur séléctionnée
 {
-switch(couleur)
+switch(color)
 {
 	case WHITE : M5.Lcd.fillScreen(WHITE); break;
 	case GREEN : M5.Lcd.fillScreen(GREEN); break;
@@ -32,3 +32,4 @@ switch(couleur)
 	case RED : M5.Lcd.fillScreen(RED); break;
 }
 }
+
