@@ -3,12 +3,12 @@
 #define int int32_t
 
 enum{
-	WHITE,
-	GREEN,
-	BLUE,
-	RED
+	BLANC,//0
+	VERT,//1
+	BLEU,//2
+	ROUGE//3
 };
-int color = WHITE;
+int color = BLANC;
 
 void setup()
 {
@@ -44,10 +44,10 @@ void act_couleur()//Rempli l'écran de la couleur séléctionnée
 {
 switch(color)
 {
-	case WHITE : M5.Lcd.fillScreen(WHITE); break;
-	case GREEN : M5.Lcd.fillScreen(GREEN); break;
-	case BLUE : M5.Lcd.fillScreen(BLUE); break;
-	case RED : M5.Lcd.fillScreen(RED); break;
+	case BLANC : M5.Lcd.fillScreen(WHITE); break;
+	case VERT : M5.Lcd.fillScreen(GREEN); break;
+	case BLEU : M5.Lcd.fillScreen(BLUE); break;
+	case ROUGE : M5.Lcd.fillScreen(RED); break;
 	default: break;
 }
 }
@@ -56,10 +56,10 @@ void trt_couleur(int BP)//Passe d'une couleur a l'autre dans l'ordre
 {
 	if(BP==0){
 		color++;
-		if(color>RED){
-			color=WHITE;
+		if(color>ROUGE){
+			color=BLANC;
 	}
 		else;
 	}
-	else{color=WHITE;}
+	else{color=BLANC;}
 }

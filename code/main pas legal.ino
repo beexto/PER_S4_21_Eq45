@@ -3,12 +3,12 @@
 #define int int32_t
 //Definitions pour l'ecran
 enum{
-	WHITE,
-	GREEN,
-	BLUE,
-	RED
+	BLANC,//0
+	VERT,//1
+	BLEU,//2
+	ROUGE//3
 };
-int color = WHITE;
+int color = BLANC;
 //==============
 void setup()
 {
@@ -25,15 +25,26 @@ void loop()
 
 void phaseUNO(void)//bouton C est le bouton de droite
 {
-	if(M5.BtnC.pressedFor(1000))
+	if(M5.BtnC.wasPressed())//test appuis court
 	{
 		color++;
-		if(color>RED){
-			color=WHITE;
+		if(color>ROUGE){
+			color=BLANC;
 	}
-	else if(M5.BtnC.wasPressed())
+	else if(M5.BtnC.pressedFor(1000))//test appuis long
 	{
-		color=WHITE
+		color=BLANC;
 	}
-	M5.Lcd.fillScreen(color);
+	
+	/*
+	Mettre la couleur sur l'ecran
+	*/
+	switch(color)
+	{
+		case BLANC : M5.Lcd.fillScreen(WHITE); break;
+		case VERT : M5.Lcd.fillScreen(GREEN); break;
+		case BLEU : M5.Lcd.fillScreen(BLUE); break;
+		case ROUGE : M5.Lcd.fillScreen(RED); break;
+		default: break;
+	}
 }
