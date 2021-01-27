@@ -36,6 +36,7 @@ int ack_bouton(void)//bouton C est le bouton de droite
 void trt_bouton(void)
 {
 	trt_couleur(ack_bouton());
+	
 	act_couleur();
 }
 
