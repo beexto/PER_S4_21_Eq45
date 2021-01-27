@@ -19,7 +19,7 @@ M5.Lcd.fillScreen(WHITE);
 
 void loop()
 {
-act_couleur();
+
 }
 
 void act_couleur()//Rempli l'écran de la couleur séléctionnée
@@ -33,3 +33,11 @@ switch(color)
 }
 }
 
+void trt_couleur()//Passe d'une couleur a l'autre dans l'ordre
+{
+	color++;
+	if(color>RED){
+		color=WHITE;
+	}
+	else;
+}
