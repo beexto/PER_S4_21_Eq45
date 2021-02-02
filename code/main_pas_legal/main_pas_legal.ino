@@ -46,7 +46,7 @@ void phaseUNO(void)//bouton C est le bouton de droite
   pressed=false;
   color++;
     if(color>ROUGE)//si couleur rouge on repasse au blanc
-      color=BLANC;
+      color=VERT;
  }
 	/*
 	Mettre la couleur sur l'ecran
