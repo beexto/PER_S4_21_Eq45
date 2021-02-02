@@ -12,18 +12,18 @@ int color = BLANC;
 //==============
 void setup()
 {
-M5.begin();
-M5.Power.begin();
-M5.Lcd.fillScreen(WHITE);
+M5.begin();//initialisation de l'objet M5stack -- celui qui contient les boutons
+M5.Power.begin();//allumage des peripheriques -- les leds sur les bords
+M5.Lcd.fillScreen(WHITE);//on remplis initialement en en blanc l'écran
 }
 
 void loop()
 {
-	M5.update();
-	phaseUNO();
+	M5.update();//lecture de l'état des boutons
+	phaseUNO();//fonction de la premiere phase client
 }
 
-bool pressed=false;
+bool pressed=false;//stocke si le bouton à été appuyé lors de la derniere boucle
 void phaseUNO(void)//bouton C est le bouton de droite
 {
 	if(M5.BtnC.wasPressed())//test appuis court
@@ -39,7 +39,7 @@ void phaseUNO(void)//bouton C est le bouton de droite
  {
   pressed=false;
   color++;
-    if(color>ROUGE)
+    if(color>ROUGE)//si couleur rouge on repasse au blanc
       color=BLANC;
  }
 	/*
