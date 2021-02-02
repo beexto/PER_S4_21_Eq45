@@ -23,19 +23,25 @@ void loop()
 	phaseUNO();
 }
 
+bool pressed=false;
 void phaseUNO(void)//bouton C est le bouton de droite
 {
 	if(M5.BtnC.wasPressed())//test appuis court
 	{
-		color++;
-		if(color>ROUGE)
-			color=BLANC;
+		pressed=true;
 	}
 	else if(M5.BtnC.pressedFor(1000))//test appuis long
 	{
 		color=BLANC;
+    pressed=false;
 	}
-	
+	if(M5.BtnC.wasReleased() && pressed)
+ {
+  pressed=false;
+  color++;
+    if(color>ROUGE)
+      color=BLANC;
+ }
 	/*
 	Mettre la couleur sur l'ecran
 	*/
