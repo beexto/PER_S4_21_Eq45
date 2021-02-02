@@ -1,5 +1,11 @@
 #include "M5Stack.h"
 
+
+#include <Adafruit_NeoPixel.h>
+#define M5STACK_FIRE_NEO_NUM_LEDS 10
+#define M5STACK_FIRE_NEO_DATA_PIN 15
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(M5STACK_FIRE_NEO_NUM_LEDS, M5STACK_FIRE_NEO_DATA_PIN, NEO_GRB + NEO_KHZ800);
+
 #define int int32_t
 //Definitions pour l'ecran
 enum{

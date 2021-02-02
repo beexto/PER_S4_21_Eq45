@@ -29,9 +29,9 @@ void loop()
   int g = 1<<random(0, 7);
   int b = 1<<random(0, 7);
 
-  pixels.setPixelColor(pixelNumber, pixels.Color(r, g, b));     
+  pixels.setPixelColor(pixelNumber, r, g, b,random(255));  
   pixels.show();
 
-  delay(100);
+  delay(10);
 
 }
