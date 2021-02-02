@@ -5,6 +5,11 @@
 #define M5STACK_FIRE_NEO_NUM_LEDS 10
 #define M5STACK_FIRE_NEO_DATA_PIN 15
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(M5STACK_FIRE_NEO_NUM_LEDS, M5STACK_FIRE_NEO_DATA_PIN, NEO_GRB + NEO_KHZ800);
+int lum=0;
+int tfreq=0;
+int courbe[100];
+int icourbe=0;
+
 
 #define int int32_t
 //Definitions pour l'ecran
@@ -59,4 +64,25 @@ void phaseUNO(void)//bouton C est le bouton de droite
 		case ROUGE : M5.Lcd.fillScreen(RED); break;
 		default: break;
 	}
+}
+
+
+void initPhase2()
+{
+	
+}
+
+void phaseDeux()
+{
+	
+}
+
+void actionGraph()
+{
+	
+}
+
+void changeFreq()
+{
+	
 }
