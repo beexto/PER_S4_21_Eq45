@@ -28,7 +28,7 @@ void phaseUNO(void)//bouton C est le bouton de droite
 	if(M5.BtnC.wasPressed())//test appuis court
 	{
 		color++;
-		if(color>ROUGE){
+		if(color>ROUGE)
 			color=BLANC;
 	}
 	else if(M5.BtnC.pressedFor(1000))//test appuis long
