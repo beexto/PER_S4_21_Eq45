@@ -4,13 +4,14 @@
 #include <Adafruit_NeoPixel.h>
 #define M5STACK_FIRE_NEO_NUM_LEDS 10
 #define M5STACK_FIRE_NEO_DATA_PIN 15
+#define courbeSIZE 100
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(M5STACK_FIRE_NEO_NUM_LEDS, M5STACK_FIRE_NEO_DATA_PIN, NEO_GRB + NEO_KHZ800);
 int lum=0;
 int tfreq=0;
 int courbe[100];
 int icourbe=0;
-
-
+unsigned long tattente=0;
+unsigned long lastmillis=0;
 #define int int32_t
 //Definitions pour l'ecran
 enum{
@@ -19,7 +20,14 @@ enum{
 	BLEU,//2
 	ROUGE//3
 };
-int color = BLANC;
+class COLOR{
+	public :
+	int couleur= BLANC;
+	int r=0;
+	int g=0;
+	int b=0;
+};
+COLOR color;
 //==============
 void setup()
 {
@@ -43,20 +51,20 @@ void phaseUNO(void)//bouton C est le bouton de droite
 	}
 	else if(M5.BtnC.pressedFor(1000))//test appuis long
 	{
-		color=BLANC;
+		colorcouleur=BLANC;
     pressed=false;
 	}
 	if(M5.BtnC.wasReleased() && pressed)
  {
   pressed=false;
-  color++;
-    if(color>ROUGE)//si couleur rouge on repasse au blanc
-      color=VERT;
+  color.couleur++;
+    if(color.couleur>ROUGE)//si couleur rouge on repasse au blanc
+      color.couleur=VERT;
  }
 	/*
 	Mettre la couleur sur l'ecran
 	*/
-	switch(color)
+	switch(color.couleur)
 	{
 		case BLANC : M5.Lcd.fillScreen(WHITE); break;
 		case VERT : M5.Lcd.fillScreen(GREEN); break;
@@ -69,20 +77,55 @@ void phaseUNO(void)//bouton C est le bouton de droite
 
 void initPhase2()
 {
-	
+	for(int i=0;i<courbeSIZE;i++)
+	{
+		courbe[i]=255*abs(sin((1/(courbeSIZE*2))*i));
+	}
 }
 
-void phaseDeux()
+void phaseDeux()//active toutes les fonctions de la phase 2
 {
-	
+	if(color==BLANC)
+	{
+		tattente=0;
+		lastmillis=0;
+	}
+	else
+	{
+		tattente=millis();
+		actionGraph();
+		changeFreq();
+	}
 }
 
-void actionGraph()
+void actionGraph()//fait clignoter les bargraph
 {
+	if(lastmillis==0)//si premier passage on initialise lastmillis au temps actuel
+		lastmillis=tattente;	
+		
+	if((millis()-lastmillis)>(tfreq/courbeSIZE))//si il est temps de passer a la case de la courbe d'apres
+	{	
+		icourbe++;
+		if(icourbe>courbeSIZE)
+		icourbe=0;
+	}
 	
+	/*On change la couleur et la luminosité de chaque led*/
+	for(int i=0;i<M5STACK_FIRE_NEO_NUM_LEDS;i++)
+	pixels.setPixelColor(pixelNumber, color.r, color.g, color.b,courbe[icourbe];  
+	
+	pixels.show();
 }
 
-void changeFreq()
+void changeFreq()//change tfreq pour savoir à quelle frequenece clignoter
+{
+	if(tattente>60000)
+	{
+		tfreq=2000;		
+	}
+}
+
+void translateColor()//mets en rgb la couelur actuelle
 {
 	
 }
