@@ -2,12 +2,12 @@
 #include <Adafruit_NeoPixel.h>
 #define M5STACK_FIRE_NEO_NUM_LEDS 10
 #define M5STACK_FIRE_NEO_DATA_PIN 15
-#define courbeSIZE 100
+#define courbeSIZE 10
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(M5STACK_FIRE_NEO_NUM_LEDS, M5STACK_FIRE_NEO_DATA_PIN, NEO_GRB + NEO_KHZ800);
 int lum=0;
 int freq[6]={0,2000,1000,500,250,125};
 int tfreq=0;//periode à laquelle on doit clignoter
-int courbe[courbeSIZE]={0,0,0,0,0,0,0,0,0,9,20,30,40,50,59,69,78,88,97,106,114,123,131,139,147,155,162,170,176,183,190,196,202,207,212,217,222,227,231,234,238,241,244,246,248,250,252,253,254,254,255,254,254,253,252,250,248,246,244,241,238,234,231,227,222,217,212,207,202,196,190,183,176,170,162,155,147,139,131,123,114,106,97,88,78,69,59,50,40,30,20,9,0,0,0,0,0,0,0,0};//400octets-->1%delamemoiredesprogrammes
+int courbe[courbeSIZE];//={0,0,0,0,0,0,0,0,0,9,20,30,40,50,59,69,78,88,97,106,114,123,131,139,147,155,162,170,176,183,190,196,202,207,212,217,222,227,231,234,238,241,244,246,248,250,252,253,254,254,255,254,254,253,252,250,248,246,244,241,238,234,231,227,222,217,212,207,202,196,190,183,176,170,162,155,147,139,131,123,114,106,97,88,78,69,59,50,40,30,20,9,0,0,0,0,0,0,0,0};//400octets-->1%delamemoiredesprogrammes
 int icourbe=0;
 unsigned long tattente=0;
 unsigned long lastmillis=0;
@@ -66,7 +66,7 @@ void setup()
 	M5.Power.begin();//allumage des peripheriques -- les leds sur les bords
 	M5.Lcd.fillScreen(WHITE);//on remplis initialement en en blanc l'écran
 	//Serial.begin(115200);
-	//initPhase2();
+	initPhase2();
 }
 
 void loop()
@@ -138,11 +138,14 @@ void phase2()//active toutes les fonctions de la phase 2
 void actionGraph()//fait clignoter les bargraph
 {
 	if((millis()-lastmillis)>(tfreq/courbeSIZE))//si il est temps de passer a la case de la courbe d'apres
-	{//le temps depuis le dernier mouvement>temps sur une case du tableau
+	{//le temps depuis le dernier mouvement>temps demandé sur une case du tableau
 		icourbe++;
+		Serial.println((String)"millis()-lastmillis="+(millis()-lastmillis));
 		lastmillis=millis();
 		if(icourbe>courbeSIZE)
 		icourbe=0;
+		//Serial.println((String)"tfreq/courbeSIZE="+(tfreq/courbeSIZE));
+		//Serial.println((String)"icourbe="+icourbe);
 	}
 }
 
@@ -154,12 +157,13 @@ void afficherGraph()/*On change la couleur et la luminosité de chaque led*/
 	{
 		if(tfreq==0)
 		{
-			Serial.println((String)"tfreq=0");
+			icourbe=0;
+			//Serial.println((String)"tfreq=0");
 			pixels.clear();
 		}
 		else
 		{
-			Serial.println((String)"tfreq="+tfreq);
+			//Serial.println((String)"tfreq="+tfreq);
 			pixels.setPixelColor(i, color.r, color.g, color.b);
 			pixels.setBrightness(courbe[icourbe]);
 		}
@@ -170,8 +174,8 @@ void afficherGraph()/*On change la couleur et la luminosité de chaque led*/
 void changeFreq()//change tfreq pour savoir à quelle frequenece clignoter
 {
 	int a=(int)((millis()-tattente)/10000);
-	Serial.println((String)"a="+a);
 	if(a>5)
 		a=5;
+	//Serial.println((String)"a="+a);
 	tfreq=freq[a];
 }
