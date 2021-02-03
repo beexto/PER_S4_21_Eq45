@@ -2,12 +2,12 @@
 #include <Adafruit_NeoPixel.h>
 #define M5STACK_FIRE_NEO_NUM_LEDS 10
 #define M5STACK_FIRE_NEO_DATA_PIN 15
-#define courbeSIZE 100
+#define courbeSIZE 30
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(M5STACK_FIRE_NEO_NUM_LEDS, M5STACK_FIRE_NEO_DATA_PIN, NEO_GRB + NEO_KHZ800);
 int lum=0;
 int freq[6]={0,2000,1000,500,250,125};
 int tfreq=0;//periode à laquelle on doit clignoter
-int courbe[courbeSIZE]={0,0,0,0,0,0,0,0,0,9,20,30,40,50,59,69,78,88,97,106,114,123,131,139,147,155,162,170,176,183,190,196,202,207,212,217,222,227,231,234,238,241,244,246,248,250,252,253,254,254,255,254,254,253,252,250,248,246,244,241,238,234,231,227,222,217,212,207,202,196,190,183,176,170,162,155,147,139,131,123,114,106,97,88,78,69,59,50,40,30,20,9,0,0,0,0,0,0,0,0};//400octets-->1%delamemoiredesprogrammes
+int courbe[courbeSIZE]={0,0,0,20,53,85,114,142,167,190,209,225,238,247,253,255,253,247,238,225,209,190,167,142,114,85,53,20,0,0};//400octets-->1%delamemoiredesprogrammes
 int icourbe=0;
 int upd=0;
 unsigned long tattente=0;
@@ -75,7 +75,6 @@ void loop()
 	M5.update();//lecture de l'état des boutons
 	phaseUNO();//fonction de la premiere phase client
 	phase2();
-  Serial.println("___________________________________________________________________________________");
 }
 
 bool pressed=false;//stocke si le bouton à été appuyé lors de la derniere boucle
