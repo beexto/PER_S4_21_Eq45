@@ -1,13 +1,11 @@
 #include "M5Stack.h"
-
-
 #include <Adafruit_NeoPixel.h>
 #define M5STACK_FIRE_NEO_NUM_LEDS 10
 #define M5STACK_FIRE_NEO_DATA_PIN 15
 #define courbeSIZE 100
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(M5STACK_FIRE_NEO_NUM_LEDS, M5STACK_FIRE_NEO_DATA_PIN, NEO_GRB + NEO_KHZ800);
 int lum=0;
-int tfreq=0;
+int tfreq=0;//periode à laquelle on doit clignoter
 int courbe[100];
 int icourbe=0;
 unsigned long tattente=0;
@@ -26,6 +24,37 @@ class COLOR{
 	int r=0;
 	int g=0;
 	int b=0;
+	
+	void updateRGB()
+	{
+		switch(couleur)
+		{
+			case BLANC :
+			r=255;
+			g=255;
+			b=255;
+			break;
+			
+			case VERT :
+			r=0;
+			g=255;
+			b=0;
+			break;
+			
+			case BLEU :
+			r=0;
+			g=0;
+			b=255;
+			break;
+			
+			case ROUGE :
+			r=255;
+			g=0;
+			b=0;
+			break;
+		}
+	}
+	
 };
 COLOR color;
 //==============
@@ -51,7 +80,7 @@ void phaseUNO(void)//bouton C est le bouton de droite
 	}
 	else if(M5.BtnC.pressedFor(1000))//test appuis long
 	{
-		colorcouleur=BLANC;
+		color.couleur=BLANC;
     pressed=false;
 	}
 	if(M5.BtnC.wasReleased() && pressed)
@@ -79,7 +108,7 @@ void initPhase2()
 {
 	for(int i=0;i<courbeSIZE;i++)
 	{
-		courbe[i]=255*abs(sin((1/(courbeSIZE*2))*i));
+		courbe[i]=255*abs(sin((3.14/(courbeSIZE))*i));
 	}
 }
 
@@ -87,12 +116,11 @@ void phaseDeux()//active toutes les fonctions de la phase 2
 {
 	if(color==BLANC)
 	{
-		tattente=0;
-		lastmillis=0;
+		tattente=millis();
+		lastmillis=millis();
 	}
 	else
 	{
-		tattente=millis();
 		actionGraph();
 		changeFreq();
 	}
@@ -111,9 +139,9 @@ void actionGraph()//fait clignoter les bargraph
 	}
 	
 	/*On change la couleur et la luminosité de chaque led*/
+	color.updateRGB();
 	for(int i=0;i<M5STACK_FIRE_NEO_NUM_LEDS;i++)
-	pixels.setPixelColor(pixelNumber, color.r, color.g, color.b,courbe[icourbe];  
-	
+	pixels.setPixelColor(i, color.r, color.g, color.b,courbe[icourbe];
 	pixels.show();
 }
 
@@ -123,9 +151,4 @@ void changeFreq()//change tfreq pour savoir à quelle frequenece clignoter
 	{
 		tfreq=2000;		
 	}
-}
-
-void translateColor()//mets en rgb la couelur actuelle
-{
-	
 }
