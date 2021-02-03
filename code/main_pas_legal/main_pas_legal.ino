@@ -8,7 +8,7 @@ int lum=0;
 //int freq[6]={30,30,20,15,10,125};
 int freq[6]={0,2000,1000,500,250,125};
 int tfreq=0;//periode à laquelle on doit clignoter
-int courbe[courbeSIZE]={0,0,0,20,53,85,114,142,167,190,209,225,238,247,253,255,253,247,238,225,209,190,167,142,114,85,53,20,0,0};//400octets-->1%delamemoiredesprogrammes
+int courbe[courbeSIZE]={0,0,0,0,0,20,40,59,78,97,114,131,147,162,176,190,202,212,222,231,238,244,248,252,254,255,254,252,248,244,238,231,222,212,202,190,176,162,147,131,114,97,78,59,40,20,0,0,0,0};//400octets-->1%delamemoiredesprogrammes
 int icourbe=0;
 int upd=0;
 unsigned long tattente=0;
@@ -74,7 +74,7 @@ void setup()
 void loop()
 {
 	M5.BtnC.read();//lecture de l'état des boutons
-	Speaker.update();
+	M5.Speaker.update();
 	phaseUNO();//fonction de la premiere phase client
 	phase2();
 }
