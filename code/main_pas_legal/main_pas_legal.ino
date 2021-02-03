@@ -61,10 +61,12 @@ COLOR color;
 //==============
 void setup()
 {
-M5.begin();//initialisation de l'objet M5stack -- celui qui contient les boutons
-M5.Power.begin();//allumage des peripheriques -- les leds sur les bords
-M5.Lcd.fillScreen(WHITE);//on remplis initialement en en blanc l'écran
-//initPhase2();
+	
+	M5.begin();//initialisation de l'objet M5stack -- celui qui contient les boutons
+	M5.Power.begin();//allumage des peripheriques -- les leds sur les bords
+	M5.Lcd.fillScreen(WHITE);//on remplis initialement en en blanc l'écran
+	//Serial.begin(115200);
+	//initPhase2();
 }
 
 void loop()
@@ -119,6 +121,7 @@ void phase2()//active toutes les fonctions de la phase 2
 {
 	if(color.couleur==BLANC)
 	{
+		Serial.println("BLANC");
 		tattente=millis();
 		lastmillis=millis();
 		tfreq=0;
@@ -150,16 +153,24 @@ void afficherGraph()/*On change la couleur et la luminosité de chaque led*/
 	for(int i=0;i<M5STACK_FIRE_NEO_NUM_LEDS;i++)
 	{
 		if(tfreq==0)
-			pixels.setPixelColor(i, color.r, color.g, color.b,0);
+		{
+			Serial.println((String)"tfreq=0");
+			pixels.clear();
+		}
 		else
-			pixels.setPixelColor(i, color.r, color.g, color.b,courbe[icourbe]);
+		{
+			Serial.println((String)"tfreq="+tfreq);
+			pixels.setPixelColor(i, color.r, color.g, color.b);
+			pixels.setBrightness(courbe[icourbe]);
+		}
 	}
 	pixels.show();
 }
 
 void changeFreq()//change tfreq pour savoir à quelle frequenece clignoter
 {
-	int a=(int)((millis()-tattente)/60000);
+	int a=(int)((millis()-tattente)/10000);
+	Serial.println((String)"a="+a);
 	if(a>5)
 		a=5;
 	tfreq=freq[a];
