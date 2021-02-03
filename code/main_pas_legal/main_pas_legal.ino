@@ -5,6 +5,7 @@
 #define courbeSIZE 30
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(M5STACK_FIRE_NEO_NUM_LEDS, M5STACK_FIRE_NEO_DATA_PIN, NEO_GRB + NEO_KHZ800);
 int lum=0;
+//int freq[6]={30,30,20,15,10,125};
 int freq[6]={0,2000,1000,500,250,125};
 int tfreq=0;//periode à laquelle on doit clignoter
 int courbe[courbeSIZE]={0,0,0,20,53,85,114,142,167,190,209,225,238,247,253,255,253,247,238,225,209,190,167,142,114,85,53,20,0,0};//400octets-->1%delamemoiredesprogrammes
@@ -72,7 +73,7 @@ void setup()
 
 void loop()
 {
-	M5.update();//lecture de l'état des boutons
+	M5.BtnC.read();//lecture de l'état des boutons
 	phaseUNO();//fonction de la premiere phase client
 	phase2();
 }
@@ -87,31 +88,31 @@ void phaseUNO(void)//bouton C est le bouton de droite
 	else if(M5.BtnC.pressedFor(1000))//test appuis long
 	{
 		color.couleur=BLANC;
-    upd=1;
-    pressed=false;
+		upd=1;
+		pressed=false;
 	}
 	if(M5.BtnC.wasReleased() && pressed)
- {
-  pressed=false;
-  color.couleur++;
-    if(color.couleur>ROUGE)//si couleur rouge on repasse au blanc
-      color.couleur=VERT;
-      upd=1;
- }
+	{
+		pressed=false;
+		color.couleur++;
+		if(color.couleur>ROUGE)//si couleur rouge on repasse au blanc
+			color.couleur=VERT;
+		upd=1;
+	}
 	/*
 	Mettre la couleur sur l'ecran
 	*/
-if(upd==1){
-	switch(color.couleur)
-	{
-		case BLANC : M5.Lcd.fillScreen(WHITE); break;
-		case VERT : M5.Lcd.fillScreen(GREEN); break;
-		case BLEU : M5.Lcd.fillScreen(BLUE); break;
-		case ROUGE : M5.Lcd.fillScreen(RED); break;
-		default: break;
+	if(upd==1){
+		switch(color.couleur)
+		{
+			case BLANC : M5.Lcd.fillScreen(WHITE); break;
+			case VERT : M5.Lcd.fillScreen(GREEN); break;
+			case BLEU : M5.Lcd.fillScreen(BLUE); break;
+			case ROUGE : M5.Lcd.fillScreen(RED); break;
+			default: break;
+		}
+	 upd=0;
 	}
- upd=0;
-}
 }
 
 
@@ -141,12 +142,13 @@ void phase2()//active toutes les fonctions de la phase 2
 	afficherGraph();
 }
 
-void actionGraph()//fait clignoter les bargraph
+void actionGraph()//fait clignoter les bargraph //le min cest 2ms par boucle a la phase2
 {
 	if((millis()-lastmillis)>(tfreq/courbeSIZE))//si il est temps de passer a la case de la courbe d'apres
 	{//le temps depuis le dernier mouvement>temps sur une case du tableau
 		icourbe++;
-    Serial.println((String)"T="+(millis()-lastmillis));
+		Serial.println((String)"T="+(millis()-lastmillis)+"--tfreq/courbeSIZE="+(tfreq/courbeSIZE));
+		
 		lastmillis=millis();
 		if(icourbe>courbeSIZE)
 		icourbe=0;
@@ -177,7 +179,7 @@ void afficherGraph()/*On change la couleur et la luminosité de chaque led*/
 void changeFreq()//change tfreq pour savoir à quelle frequenece clignoter
 {
 	int a=(int)((millis()-tattente)/60000);
-	Serial.println((String)"a="+a);
+	
 	if(a>5)
 		a=5;
 	tfreq=freq[a];
