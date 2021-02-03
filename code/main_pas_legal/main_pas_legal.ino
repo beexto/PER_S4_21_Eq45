@@ -114,7 +114,7 @@ void initPhase2()
 
 void phaseDeux()//active toutes les fonctions de la phase 2
 {
-	if(color==BLANC)
+	if(color.couleur==BLANC)
 	{
 		tattente=millis();
 		lastmillis=millis();
@@ -141,14 +141,34 @@ void actionGraph()//fait clignoter les bargraph
 	/*On change la couleur et la luminosité de chaque led*/
 	color.updateRGB();
 	for(int i=0;i<M5STACK_FIRE_NEO_NUM_LEDS;i++)
-	pixels.setPixelColor(i, color.r, color.g, color.b,courbe[icourbe];
+	pixels.setPixelColor(i, color.r, color.g, color.b,courbe[icourbe]);
 	pixels.show();
 }
 
 void changeFreq()//change tfreq pour savoir à quelle frequenece clignoter
 {
-	if(tattente>60000)
+	
+	if(millis()-tattente<60000)
 	{
-		tfreq=2000;		
+	}
+	else if(millis()-tattente<120000)//2 mins
+	{
+		tfreq=2000;//0.5Hz
+	}
+	else if(millis()-tattente<180000)//3 mins
+	{
+		tfreq=1000;//1Hz
+	}
+	else if(millis()-tattente<240000)//4 mins
+	{
+		tfreq=500;//2Hz	
+	}
+	else if(millis()-tattente<300000)//5 mins
+	{
+		tfreq=250;//4Hz	
+	}
+	else if(millis()-tattente<360000)//6 mins
+	{
+		tfreq=125;//8Hz	
 	}
 }
