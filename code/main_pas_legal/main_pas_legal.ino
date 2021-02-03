@@ -9,6 +9,7 @@ int freq[6]={0,2000,1000,500,250,125};
 int tfreq=0;//periode à laquelle on doit clignoter
 int courbe[courbeSIZE]={0,0,0,0,0,0,0,0,0,9,20,30,40,50,59,69,78,88,97,106,114,123,131,139,147,155,162,170,176,183,190,196,202,207,212,217,222,227,231,234,238,241,244,246,248,250,252,253,254,254,255,254,254,253,252,250,248,246,244,241,238,234,231,227,222,217,212,207,202,196,190,183,176,170,162,155,147,139,131,123,114,106,97,88,78,69,59,50,40,30,20,9,0,0,0,0,0,0,0,0};//400octets-->1%delamemoiredesprogrammes
 int icourbe=0;
+int upd=0;
 unsigned long tattente=0;
 unsigned long lastmillis=0;
 #define int int32_t
@@ -74,6 +75,7 @@ void loop()
 	M5.update();//lecture de l'état des boutons
 	phaseUNO();//fonction de la premiere phase client
 	phase2();
+  Serial.println("___________________________________________________________________________________");
 }
 
 bool pressed=false;//stocke si le bouton à été appuyé lors de la derniere boucle
@@ -86,6 +88,7 @@ void phaseUNO(void)//bouton C est le bouton de droite
 	else if(M5.BtnC.pressedFor(1000))//test appuis long
 	{
 		color.couleur=BLANC;
+    upd=1;
     pressed=false;
 	}
 	if(M5.BtnC.wasReleased() && pressed)
@@ -94,10 +97,12 @@ void phaseUNO(void)//bouton C est le bouton de droite
   color.couleur++;
     if(color.couleur>ROUGE)//si couleur rouge on repasse au blanc
       color.couleur=VERT;
+      upd=1;
  }
 	/*
 	Mettre la couleur sur l'ecran
 	*/
+if(upd==1){
 	switch(color.couleur)
 	{
 		case BLANC : M5.Lcd.fillScreen(WHITE); break;
@@ -106,6 +111,8 @@ void phaseUNO(void)//bouton C est le bouton de droite
 		case ROUGE : M5.Lcd.fillScreen(RED); break;
 		default: break;
 	}
+ upd=0;
+}
 }
 
 
@@ -140,6 +147,7 @@ void actionGraph()//fait clignoter les bargraph
 	if((millis()-lastmillis)>(tfreq/courbeSIZE))//si il est temps de passer a la case de la courbe d'apres
 	{//le temps depuis le dernier mouvement>temps sur une case du tableau
 		icourbe++;
+    Serial.println((String)"T="+(millis()-lastmillis));
 		lastmillis=millis();
 		if(icourbe>courbeSIZE)
 		icourbe=0;
@@ -154,14 +162,14 @@ void afficherGraph()/*On change la couleur et la luminosité de chaque led*/
 	{
 		if(tfreq==0)
 		{
-			Serial.println((String)"tfreq=0");
+			//Serial.println((String)"tfreq=0");
 			pixels.clear();
 		}
 		else
 		{
-			Serial.println((String)"tfreq="+tfreq);
-			pixels.setPixelColor(i, color.r, color.g, color.b);
-			pixels.setBrightness(courbe[icourbe]);
+			//Serial.println((String)"tfreq="+tfreq);
+		  pixels.setPixelColor(i, color.r, color.g, color.b);
+		  pixels.setBrightness(courbe[icourbe]);
 		}
 	}
 	pixels.show();
@@ -169,7 +177,7 @@ void afficherGraph()/*On change la couleur et la luminosité de chaque led*/
 
 void changeFreq()//change tfreq pour savoir à quelle frequenece clignoter
 {
-	int a=(int)((millis()-tattente)/10000);
+	int a=(int)((millis()-tattente)/60000);
 	Serial.println((String)"a="+a);
 	if(a>5)
 		a=5;
