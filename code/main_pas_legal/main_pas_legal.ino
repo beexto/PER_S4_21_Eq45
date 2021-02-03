@@ -74,6 +74,7 @@ void setup()
 void loop()
 {
 	M5.BtnC.read();//lecture de l'état des boutons
+	Speaker.update();
 	phaseUNO();//fonction de la premiere phase client
 	phase2();
 }
