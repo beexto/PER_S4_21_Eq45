@@ -116,7 +116,7 @@ void phaseUNO(void)//bouton C est le bouton de droite
 }
 
 
-void initPhase2()
+void initPhase2()//test de courbe
 {
 	for(int i=0;i<courbeSIZE;i++)
 	{
