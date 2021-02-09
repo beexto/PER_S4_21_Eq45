@@ -6,14 +6,14 @@
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(M5STACK_FIRE_NEO_NUM_LEDS, M5STACK_FIRE_NEO_DATA_PIN, NEO_GRB + NEO_KHZ800);
 int lum=0;
 //int freq[6]={30,30,20,15,10,125};
-int freq[6]={0,2000,1000,500,250,125};
+int freq[6]={0,2000,1000,500,250,125};// les frequences à suivre
 int tfreq=0;//periode à laquelle on doit clignoter
 int courbe[courbeSIZE]={0,0,0,0,0,20,40,59,78,97,114,131,147,162,176,190,202,212,222,231,238,244,248,252,254,255,254,252,248,244,238,231,222,212,202,190,176,162,147,131,114,97,78,59,40,20,0,0,0,0};//400octets-->1%delamemoiredesprogrammes
-int icourbe=0;
-int upd=0;
-unsigned long tattente=0;
-unsigned long lastmillis=0;
-#define int int32_t
+int icourbe=0;//l'emplacement de courbe[] à lire
+int upd=0;//pour savoir si l'ecran doit etre rafraichi
+unsigned long tattente=0;//repere dans le temps de quand on est passé au mode d'attente (couleur autre que blanche)
+unsigned long lastmillis=0;//repere dans le temps du dernier changement de icourbe
+#define int int32_t// pour etre sûr que les int sont sur 32 bits
 //Definitions pour l'ecran
 enum{
 	BLANC,//0
@@ -67,8 +67,7 @@ void setup()
 	M5.begin();//initialisation de l'objet M5stack -- celui qui contient les boutons
 	M5.Power.begin();//allumage des peripheriques -- les leds sur les bords
 	M5.Lcd.fillScreen(WHITE);//on remplis initialement en en blanc l'écran
-	//Serial.begin(115200);
-	//initPhase2();
+	//initPhase2();//rempli le tableau courbe[] avec une sin redressé
 }
 
 void loop()
@@ -76,7 +75,7 @@ void loop()
 	M5.BtnC.read();//lecture de l'état des boutons
 	M5.Speaker.update();
 	phaseUNO();//fonction de la premiere phase client
-	phase2();
+	phase2();//fonction de la deuxieme phase client
 }
 
 bool pressed=false;//stocke si le bouton à été appuyé lors de la derniere boucle
@@ -96,7 +95,7 @@ void phaseUNO(void)//bouton C est le bouton de droite
 	{
 		pressed=false;
 		color.couleur++;
-		if(color.couleur>ROUGE)//si couleur rouge on repasse au blanc
+		if(color.couleur>ROUGE)//si couleur rouge on repasse au vert
 			color.couleur=VERT;
 		upd=1;
 	}
@@ -121,7 +120,7 @@ void initPhase2()
 {
 	for(int i=0;i<courbeSIZE;i++)
 	{
-		courbe[i]=255*abs(sin((3.14/(courbeSIZE))*i));
+		courbe[i]=255*abs(sin((3.14/(courbeSIZE))*i));//sin redressé
 	}
 }
 
@@ -130,17 +129,18 @@ void phase2()//active toutes les fonctions de la phase 2
 	if(color.couleur==BLANC)
 	{
 		Serial.println("BLANC");
+		/*On mets a jour les repere*/
 		tattente=millis();
 		lastmillis=millis();
-		tfreq=0;
+		tfreq=0;//on ne clignote pas
 	}
 	else
 	{
-		actionGraph();
-		changeFreq();
+		actionGraph();//on change icourbe si besoin
+		changeFreq();//on change la frequence si besoin
 	}
 	
-	afficherGraph();
+	afficherGraph();//on mets a jour les leds
 }
 
 void actionGraph()//fait clignoter les bargraph //le min cest 2ms par boucle a la phase2
@@ -151,7 +151,7 @@ void actionGraph()//fait clignoter les bargraph //le min cest 2ms par boucle a l
 		Serial.println((String)"T="+(millis()-lastmillis)+"--tfreq/courbeSIZE="+(tfreq/courbeSIZE));
 		
 		lastmillis=millis();
-		if(icourbe>courbeSIZE)
+		if(icourbe>courbeSIZE)//remise à zero de icourbe si au bout de courbe[]
 		icourbe=0;
 	}
 }
