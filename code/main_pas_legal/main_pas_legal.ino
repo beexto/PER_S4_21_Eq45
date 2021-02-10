@@ -154,13 +154,11 @@ void loop()
 {
 	M5.BtnC.read();//lecture de l'état des boutons
 	M5.Speaker.update();
-	phaseUNO();//fonction de la premiere phase client
 	phase1();//fonction de la premiere phase client
 	phase2();//fonction de la deuxieme phase client
 }
 
 
-void phaseUNO(void)//bouton C est le bouton de droite
 void phase1(void)//bouton C est le bouton de droite
 {
 	if(M5.BtnC.wasPressed())//test appuis court
