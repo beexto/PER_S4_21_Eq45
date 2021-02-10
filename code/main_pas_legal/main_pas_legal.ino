@@ -130,7 +130,15 @@ void initPhase2()//test de courbe
 
 void phase2()//active toutes les fonctions de la phase 2
 {
-	if(color.couleur=!BLANC)
+	if(color.couleur==BLANC)
+	{
+		Serial.println("BLANC");
+		/*On mets a jour les repere*/
+		tattente=millis();
+		lastmillis=millis();
+		tfreq=0;//on ne clignote pas
+	}
+	else
 	{
 		actionGraph();//on change icourbe si besoin
 		changeFreq();//on change la frequence si besoin
