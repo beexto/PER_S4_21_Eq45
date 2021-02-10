@@ -13,6 +13,7 @@ int icourbe=0;//l'emplacement de courbe[] à lire
 int upd=0;//pour savoir si l'ecran doit etre rafraichi
 unsigned long tattente=0;//repere dans le temps de quand on est passé au mode d'attente (couleur autre que blanche)
 unsigned long lastmillis=0;//repere dans le temps du dernier changement de icourbe
+bool pressed=false;//stocke si le bouton à été appuyé lors de la derniere boucle
 #define int int32_t// pour etre sûr que les int sont sur 32 bits
 //Definitions pour l'ecran
 enum{
@@ -60,6 +61,7 @@ class COLOR{
 	
 };
 COLOR color;
+
 //==============
 void setup()
 {
@@ -68,6 +70,84 @@ void setup()
 	M5.Power.begin();//allumage des peripheriques -- les leds sur les bords
 	M5.Lcd.fillScreen(WHITE);//on remplis initialement en en blanc l'écran
 	//initPhase2();//rempli le tableau courbe[] avec une sin redressé
+	pixels.clear();
+	pixels.show();
+	
+	M5.Lcd.setCursor(30, 20, 2);
+	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
+	M5.Lcd.setTextFont(4);
+	M5.Lcd.println("Blanc pas de demande");
+	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
+	M5.Lcd.setCursor(225, 210, 4);
+	M5.Lcd.println("Next");
+	while(1)
+	{
+		if(M5.BtnC.wasPressed())
+			pressed=true;
+		M5.BtnC.read();	
+		if(M5.BtnC.wasReleased() && pressed)
+			break;
+	}
+	pressed=false;
+	M5.Lcd.fillScreen(GREEN);
+	M5.Lcd.setCursor(60, 20, 2);
+	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
+	M5.Lcd.setTextFont(4);
+	M5.Lcd.println("Vert : demande");
+	M5.Lcd.setCursor(60, 45, 4);
+	M5.Lcd.println("de verification");
+	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
+	M5.Lcd.setCursor(225, 210, 4);
+	M5.Lcd.println("Next");
+	while(1)
+	{
+		if(M5.BtnC.wasPressed())
+			pressed=true;
+		M5.BtnC.read();	
+		if(M5.BtnC.wasReleased() && pressed)
+			break;
+	}
+	pressed=false;
+	M5.Lcd.fillScreen(BLUE);
+	M5.Lcd.setCursor(60, 20, 2);
+	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
+	M5.Lcd.setTextFont(4);
+	M5.Lcd.println("Bleu : demande");
+	M5.Lcd.setCursor(60, 45, 4);
+	M5.Lcd.println("d'explication");
+	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
+	M5.Lcd.setCursor(225, 210, 4);
+	M5.Lcd.println("Next");
+	while(1)
+	{
+		if(M5.BtnC.wasPressed())
+			pressed=true;
+		M5.BtnC.read();	
+		if(M5.BtnC.wasReleased() && pressed)
+			break;
+	}
+	pressed=false;
+	M5.Lcd.fillScreen(RED);
+	M5.Lcd.setCursor(60, 20, 2);
+	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
+	M5.Lcd.setTextFont(4);
+	M5.Lcd.println("Rouge : demande");
+	M5.Lcd.setCursor(60, 45, 4);
+	M5.Lcd.println("d'accompagnement");
+	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
+	M5.Lcd.setCursor(225, 210, 4);
+	M5.Lcd.println("Next");
+	while(1)
+	{
+		if(M5.BtnC.wasPressed())
+			pressed=true;
+		M5.BtnC.read();	
+		if(M5.BtnC.wasReleased() && pressed)
+			break;
+	}	
+	pressed=false;
+	color.couleur=BLANC;
+	M5.Lcd.fillScreen(WHITE);
 }
 
 void loop()
@@ -78,7 +158,7 @@ void loop()
 	phase2();//fonction de la deuxieme phase client
 }
 
-bool pressed=false;//stocke si le bouton à été appuyé lors de la derniere boucle
+
 void phaseUNO(void)//bouton C est le bouton de droite
 {
 	if(M5.BtnC.wasPressed())//test appuis court
