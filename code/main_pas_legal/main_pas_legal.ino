@@ -93,6 +93,11 @@ void setup()
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.print(".");
+		M5.Lcd.fillScreen(WHITE);
+		M5.Lcd.setCursor(1, 70, 2);
+		M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
+		M5.Lcd.setTextFont(4);
+		M5.Lcd.print("Connecting");
     }
     Serial.println("");
     Serial.println("WiFi connected");
@@ -105,12 +110,14 @@ void setup()
 	M5.Lcd.setCursor(1, 70, 2);
 	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
 	M5.Lcd.setTextFont(4);
-	M5.Lcd.print((String)"SSID:"+ssid+" IP:");
+	M5.Lcd.println((String)"SSID:"+ssid);
+	M5.Lcd.print("IP:");
 	M5.Lcd.println(WiFi.localIP());
 }
 
 void loop()
 {
+	Serial.println("loop");
 	M5.BtnC.read();//lecture de l'état des boutons
 	M5.Speaker.update();
 	phase1();//fonction de la premiere phase client
@@ -309,13 +316,14 @@ void tuto()
 
 void phase3()
 {
-	if(tattente>2000)
+	if(millis()-tattente>2000)
 	{
 		WiFiClient client;
 		if (!client.connect(host, httpPort)) {
 			Serial.println("connection failed");
 			return;
 		}
-		client.print((String)"qui+"+color.couleur);
+		else client.print((String)"qui+"+color.couleur);
+		
 	}		
 }
