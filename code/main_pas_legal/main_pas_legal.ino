@@ -1,3 +1,11 @@
+#include <WiFi.h>
+
+const char* ssid     = "mipmip";
+const char* password = "pimpimpim";
+
+const char* host = "192.168.60.1";
+const int httpPort = 80;
+
 #include "M5Stack.h"
 #include <Adafruit_NeoPixel.h>
 #define M5STACK_FIRE_NEO_NUM_LEDS 10
@@ -72,8 +80,159 @@ void setup()
 	//initPhase2();//rempli le tableau courbe[] avec une sin redressé
 	pixels.clear();
 	pixels.show();
+	tuto();
 	
-	M5.Lcd.setCursor(30, 20, 2);
+	
+	
+	
+	Serial.println();
+    Serial.println();
+    Serial.print("Connecting to ");
+    Serial.println(ssid);
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+    }
+    Serial.println("");
+    Serial.println("WiFi connected");
+    Serial.println("IP address: ");
+    Serial.println(WiFi.localIP());
+	
+	pressed=false;
+	color.couleur=BLANC;
+	M5.Lcd.fillScreen(WHITE);
+	M5.Lcd.setCursor(1, 70, 2);
+	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
+	M5.Lcd.setTextFont(4);
+	M5.Lcd.print((String)"SSID:"+ssid+" IP:");
+	M5.Lcd.println(WiFi.localIP());
+}
+
+void loop()
+{
+	M5.BtnC.read();//lecture de l'état des boutons
+	M5.Speaker.update();
+	phaseUNO();//fonction de la premiere phase client
+	phase2();//fonction de la deuxieme phase client
+	phase3();
+}
+
+
+void phaseUNO(void)//bouton C est le bouton de droite
+{
+	if(M5.BtnC.wasPressed())//test appuis court
+	{
+		pressed=true;
+   /*On mets a jour les repere*/
+    tattente=millis();
+    lastmillis=millis();
+    tfreq=0;//on ne clignote pas
+	}
+	else if(M5.BtnC.pressedFor(1000))//test appuis long
+	{
+		color.couleur=BLANC;
+		upd=1;
+		pressed=false;
+	}
+	if(M5.BtnC.wasReleased() && pressed)
+	{
+		pressed=false;
+		color.couleur++;
+		if(color.couleur>ROUGE)//si couleur rouge on repasse au vert
+			color.couleur=VERT;
+		upd=1;
+	}
+	/*
+	Mettre la couleur sur l'ecran
+	*/
+	if(upd==1){
+		switch(color.couleur)
+		{
+			case BLANC : M5.Lcd.fillScreen(WHITE); break;
+			case VERT : M5.Lcd.fillScreen(GREEN); break;
+			case BLEU : M5.Lcd.fillScreen(BLUE); break;
+			case ROUGE : M5.Lcd.fillScreen(RED); break;
+			default: break;
+		}
+	 upd=0;
+	}
+}
+
+
+void initPhase2()//test de courbe
+{
+	for(int i=0;i<courbeSIZE;i++)
+	{
+		courbe[i]=255*abs(sin((3.14/(courbeSIZE))*i));//sin redressé
+	}
+}
+
+void phase2()//active toutes les fonctions de la phase 2
+{
+	if(color.couleur==BLANC)
+	{
+		//Serial.println("BLANC");
+		/*On mets a jour les repere*/
+		tattente=millis();
+		lastmillis=millis();
+		tfreq=0;//on ne clignote pas
+	}
+	else
+	{
+		actionGraph();//on change icourbe si besoin
+		changeFreq();//on change la frequence si besoin
+	}
+	
+	afficherGraph();//on mets a jour les leds
+}
+
+void actionGraph()//fait clignoter les bargraph //le min cest 2ms par boucle a la phase2
+{
+	if((millis()-lastmillis)>(tfreq/courbeSIZE))//si il est temps de passer a la case de la courbe d'apres
+	{//le temps depuis le dernier mouvement>temps sur une case du tableau
+		icourbe++;
+		Serial.println((String)"T="+(millis()-lastmillis)+"--tfreq/courbeSIZE="+(tfreq/courbeSIZE));
+		
+		lastmillis=millis();
+		if(icourbe>courbeSIZE)//remise à zero de icourbe si au bout de courbe[]
+		icourbe=0;
+	}
+}
+
+void afficherGraph()/*On change la couleur et la luminosité de chaque led*/
+{
+	
+	color.updateRGB();
+	for(int i=0;i<M5STACK_FIRE_NEO_NUM_LEDS;i++)
+	{
+		if(tfreq==0)
+		{
+			//Serial.println((String)"tfreq=0");
+			pixels.clear();
+		}
+		else
+		{
+			//Serial.println((String)"tfreq="+tfreq);
+		  pixels.setPixelColor(i, color.r, color.g, color.b);
+		  pixels.setBrightness(courbe[icourbe]);
+		}
+	}
+	pixels.show();
+}
+
+void changeFreq()//change tfreq pour savoir à quelle frequenece clignoter
+{
+	int a=(int)((millis()-tattente)/60000);
+	
+	if(a>5)
+		a=5;
+	tfreq=freq[a];
+}
+
+void tuto()
+{
+		M5.Lcd.setCursor(30, 20, 2);
 	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
 	M5.Lcd.setTextFont(4);
 	M5.Lcd.println("Blanc pas de demande");
@@ -145,127 +304,18 @@ void setup()
 		if(M5.BtnC.wasReleased() && pressed)
 			break;
 	}	
-	pressed=false;
-	color.couleur=BLANC;
-	M5.Lcd.fillScreen(WHITE);
-}
-
-void loop()
-{
-	M5.BtnC.read();//lecture de l'état des boutons
-	M5.Speaker.update();
-	phaseUNO();//fonction de la premiere phase client
-	phase2();//fonction de la deuxieme phase client
-}
-
-
-void phaseUNO(void)//bouton C est le bouton de droite
-{
-	if(M5.BtnC.wasPressed())//test appuis court
-	{
-		pressed=true;
-   /*On mets a jour les repere*/
-    tattente=millis();
-    lastmillis=millis();
-    tfreq=0;//on ne clignote pas
-	}
-	else if(M5.BtnC.pressedFor(1000))//test appuis long
-	{
-		color.couleur=BLANC;
-		upd=1;
-		pressed=false;
-	}
-	if(M5.BtnC.wasReleased() && pressed)
-	{
-		pressed=false;
-		color.couleur++;
-		if(color.couleur>ROUGE)//si couleur rouge on repasse au vert
-			color.couleur=VERT;
-		upd=1;
-	}
-	/*
-	Mettre la couleur sur l'ecran
-	*/
-	if(upd==1){
-		switch(color.couleur)
-		{
-			case BLANC : M5.Lcd.fillScreen(WHITE); break;
-			case VERT : M5.Lcd.fillScreen(GREEN); break;
-			case BLEU : M5.Lcd.fillScreen(BLUE); break;
-			case ROUGE : M5.Lcd.fillScreen(RED); break;
-			default: break;
-		}
-	 upd=0;
-	}
-}
-
-
-void initPhase2()//test de courbe
-{
-	for(int i=0;i<courbeSIZE;i++)
-	{
-		courbe[i]=255*abs(sin((3.14/(courbeSIZE))*i));//sin redressé
-	}
-}
-
-void phase2()//active toutes les fonctions de la phase 2
-{
-	if(color.couleur==BLANC)
-	{
-		Serial.println("BLANC");
-		/*On mets a jour les repere*/
-		tattente=millis();
-		lastmillis=millis();
-		tfreq=0;//on ne clignote pas
-	}
-	else
-	{
-		actionGraph();//on change icourbe si besoin
-		changeFreq();//on change la frequence si besoin
-	}
 	
-	afficherGraph();//on mets a jour les leds
 }
 
-void actionGraph()//fait clignoter les bargraph //le min cest 2ms par boucle a la phase2
+void phase3()
 {
-	if((millis()-lastmillis)>(tfreq/courbeSIZE))//si il est temps de passer a la case de la courbe d'apres
-	{//le temps depuis le dernier mouvement>temps sur une case du tableau
-		icourbe++;
-		Serial.println((String)"T="+(millis()-lastmillis)+"--tfreq/courbeSIZE="+(tfreq/courbeSIZE));
-		
-		lastmillis=millis();
-		if(icourbe>courbeSIZE)//remise à zero de icourbe si au bout de courbe[]
-		icourbe=0;
-	}
-}
-
-void afficherGraph()/*On change la couleur et la luminosité de chaque led*/
-{
-	
-	color.updateRGB();
-	for(int i=0;i<M5STACK_FIRE_NEO_NUM_LEDS;i++)
+	if(tattente>2000)
 	{
-		if(tfreq==0)
-		{
-			//Serial.println((String)"tfreq=0");
-			pixels.clear();
+		WiFiClient client;
+		if (!client.connect(host, httpPort)) {
+			Serial.println("connection failed");
+			return;
 		}
-		else
-		{
-			//Serial.println((String)"tfreq="+tfreq);
-		  pixels.setPixelColor(i, color.r, color.g, color.b);
-		  pixels.setBrightness(courbe[icourbe]);
-		}
-	}
-	pixels.show();
-}
-
-void changeFreq()//change tfreq pour savoir à quelle frequenece clignoter
-{
-	int a=(int)((millis()-tattente)/60000);
-	
-	if(a>5)
-		a=5;
-	tfreq=freq[a];
+		client.print((String)"qui+"+color.couleur);
+	}		
 }
