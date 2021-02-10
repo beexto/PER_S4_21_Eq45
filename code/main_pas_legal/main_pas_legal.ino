@@ -164,6 +164,10 @@ void phaseUNO(void)//bouton C est le bouton de droite
 	if(M5.BtnC.wasPressed())//test appuis court
 	{
 		pressed=true;
+   /*On mets a jour les repere*/
+    tattente=millis();
+    lastmillis=millis();
+    tfreq=0;//on ne clignote pas
 	}
 	else if(M5.BtnC.pressedFor(1000))//test appuis long
 	{
