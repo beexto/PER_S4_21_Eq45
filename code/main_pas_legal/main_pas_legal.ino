@@ -318,7 +318,7 @@ void tuto()
 
 void phase3()
 {
-	if(millis()-tattente>2000 && !sent)
+	if((millis()-tattente>2000) && !sent)
 	{
 		Serial.print("envoi");
 		WiFiClient client;
@@ -328,6 +328,8 @@ void phase3()
 		}
 		else client.print((String)"qui+"+color.couleur);
 	}
-	else
+	else if(millis()-tattente>2000)
+	{
 	sent=true;
+	}
 }
