@@ -1,7 +1,7 @@
 #include <WiFi.h>
 
-const char* ssid     = "mipmip";
-const char* password = "pimpimpim";
+const char* ssid     = "BusyLight";
+const char* password = "imsobusy";
 
 const char* host = "192.168.60.1";
 const int httpPort = 80;
@@ -22,6 +22,7 @@ int upd=0;//pour savoir si l'ecran doit etre rafraichi
 unsigned long tattente=0;//repere dans le temps de quand on est passé au mode d'attente (couleur autre que blanche)
 unsigned long lastmillis=0;//repere dans le temps du dernier changement de icourbe
 bool pressed=false;//stocke si le bouton à été appuyé lors de la derniere boucle
+bool sent=false;
 #define int int32_t// pour etre sûr que les int sont sur 32 bits
 //Definitions pour l'ecran
 enum{
@@ -154,6 +155,7 @@ void phase1(void)//bouton C est le bouton de droite
 	Mettre la couleur sur l'ecran
 	*/
 	if(upd==1){
+		sent=false;
 		switch(color.couleur)
 		{
 			case BLANC : M5.Lcd.fillScreen(WHITE); break;
@@ -316,7 +318,7 @@ void tuto()
 
 void phase3()
 {
-	if(millis()-tattente>2000)
+	if(millis()-tattente>2000 && !sent)
 	{
 		WiFiClient client;
 		if (!client.connect(host, httpPort)) {
@@ -324,6 +326,7 @@ void phase3()
 			return;
 		}
 		else client.print((String)"qui+"+color.couleur);
-		
-	}		
+	}
+	else
+	sent=true;
 }
