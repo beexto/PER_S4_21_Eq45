@@ -118,7 +118,7 @@ void setup()
 
 void loop()
 {
-	Serial.println("loop");
+	//Serial.println("loop");
 	M5.BtnC.read();//lecture de l'état des boutons
 	M5.Speaker.update();
 	phase1();//fonction de la premiere phase client
@@ -201,7 +201,7 @@ void actionGraph()//fait clignoter les bargraph //le min cest 2ms par boucle a l
 	if((millis()-lastmillis)>(tfreq/courbeSIZE))//si il est temps de passer a la case de la courbe d'apres
 	{//le temps depuis le dernier mouvement>temps sur une case du tableau
 		icourbe++;
-		Serial.println((String)"T="+(millis()-lastmillis)+"--tfreq/courbeSIZE="+(tfreq/courbeSIZE));
+		//Serial.println((String)"T="+(millis()-lastmillis)+"--tfreq/courbeSIZE="+(tfreq/courbeSIZE));
 		
 		lastmillis=millis();
 		if(icourbe>courbeSIZE)//remise à zero de icourbe si au bout de courbe[]
@@ -320,6 +320,7 @@ void phase3()
 {
 	if(millis()-tattente>2000 && !sent)
 	{
+		Serial.print("envoi");
 		WiFiClient client;
 		if (!client.connect(host, httpPort)) {
 			Serial.println("connection failed");
