@@ -1,5 +1,5 @@
 #include <WiFi.h>
-
+#include <HTTPClient.h>
 const char* ssid     = "BusyLight";
 const char* password = "imsobusy";
 
@@ -320,16 +320,21 @@ void phase3()
 {
 	if((millis()-tattente>2000) && !sent)
 	{
-		WiFiClient client;
-		if (!client.connect(host, httpPort)) {
-			Serial.println("connection failed");
-			return;
-		}
-		else
-		{
-		client.print((String)"GET /entry.php?cID="+"Eq45+"+"&lvl="+color.couleur);
-		sent=true;
-		Serial.println("envoie");
-		}
+		HTTPClient http;
+    http.begin((String)"http://192.168.60.1/entry.php?"+"cID="+"eq45"+"&lvl="+color.couleur ); //Specify the URL
+    int httpCode = http.GET();                                        //Make the request
+ 
+    if (httpCode > 0) { //Check for the returning code
+ 
+        String payload = http.getString();
+        Serial.println(httpCode);
+        Serial.println(payload);
+      }
+ 
+    else {
+      Serial.println("Error on HTTP request");
+    }
+ 
+    http.end(); //Free the resources
 	}
 }
