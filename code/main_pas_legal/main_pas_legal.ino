@@ -320,16 +320,16 @@ void phase3()
 {
 	if((millis()-tattente>2000) && !sent)
 	{
-		Serial.print("envoi");
 		WiFiClient client;
 		if (!client.connect(host, httpPort)) {
 			Serial.println("connection failed");
 			return;
 		}
-		else client.print((String)"qui+"+color.couleur);
-	}
-	else if(millis()-tattente>2000)
-	{
-	sent=true;
+		else
+		{
+		client.print((String)"GET /entry.php?cID="+"Eq45+"+"&lvl="+color.couleur);
+		sent=true;
+		Serial.println("envoie");
+		}
 	}
 }
