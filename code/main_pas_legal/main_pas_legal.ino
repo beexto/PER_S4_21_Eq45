@@ -1,7 +1,7 @@
 #include <WiFi.h>
 
-const char* ssid     = "mipmip";
-const char* password = "pimpimpim";
+const char* ssid     = "Oneplus";
+const char* password = "fsdx2433";
 
 const char* host = "192.168.60.1";
 const int httpPort = 80;
