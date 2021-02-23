@@ -1,7 +1,7 @@
 #include <WiFi.h>
 
-const char* ssid     = "Oneplus";
-const char* password = "fsdx2433";
+const char* ssid     = "BusyLight";
+const char* password = "imsobusy";
 
 const char* host = "192.168.60.1";
 const int httpPort = 80;
@@ -22,6 +22,7 @@ int upd=0;//pour savoir si l'ecran doit etre rafraichi
 unsigned long tattente=0;//repere dans le temps de quand on est passé au mode d'attente (couleur autre que blanche)
 unsigned long lastmillis=0;//repere dans le temps du dernier changement de icourbe
 bool pressed=false;//stocke si le bouton à été appuyé lors de la derniere boucle
+bool sent=false;
 #define int int32_t// pour etre sûr que les int sont sur 32 bits
 //Definitions pour l'ecran
 enum{
@@ -117,7 +118,7 @@ void setup()
 
 void loop()
 {
-	Serial.println("loop");
+	//Serial.println("loop");
 	M5.BtnC.read();//lecture de l'état des boutons
 	M5.Speaker.update();
 	phase1();//fonction de la premiere phase client
@@ -154,6 +155,7 @@ void phase1(void)//bouton C est le bouton de droite
 	Mettre la couleur sur l'ecran
 	*/
 	if(upd==1){
+		sent=false;
 		switch(color.couleur)
 		{
 			case BLANC : M5.Lcd.fillScreen(WHITE); break;
@@ -199,7 +201,7 @@ void actionGraph()//fait clignoter les bargraph //le min cest 2ms par boucle a l
 	if((millis()-lastmillis)>(tfreq/courbeSIZE))//si il est temps de passer a la case de la courbe d'apres
 	{//le temps depuis le dernier mouvement>temps sur une case du tableau
 		icourbe++;
-		Serial.println((String)"T="+(millis()-lastmillis)+"--tfreq/courbeSIZE="+(tfreq/courbeSIZE));
+		//Serial.println((String)"T="+(millis()-lastmillis)+"--tfreq/courbeSIZE="+(tfreq/courbeSIZE));
 		
 		lastmillis=millis();
 		if(icourbe>courbeSIZE)//remise à zero de icourbe si au bout de courbe[]
@@ -316,14 +318,18 @@ void tuto()
 
 void phase3()
 {
-	if(millis()-tattente>2000)
+	if((millis()-tattente>2000) && !sent)
 	{
+		Serial.print("envoi");
 		WiFiClient client;
 		if (!client.connect(host, httpPort)) {
 			Serial.println("connection failed");
 			return;
 		}
 		else client.print((String)"qui+"+color.couleur);
-		
-	}		
+	}
+	else if(millis()-tattente>2000)
+	{
+	sent=true;
+	}
 }
