@@ -23,6 +23,7 @@ unsigned long tattente=0;//repere dans le temps de quand on est passé au mode d
 unsigned long lastmillis=0;//repere dans le temps du dernier changement de icourbe
 bool pressed=false;//stocke si le bouton à été appuyé lors de la derniere boucle
 bool sent=false;
+bool envoiblanc=false;
 #define int int32_t// pour etre sûr que les int sont sur 32 bits
 //Definitions pour l'ecran
 enum{
@@ -96,7 +97,7 @@ void setup()
         Serial.print(".");
 		M5.Lcd.fillScreen(WHITE);
 		M5.Lcd.setCursor(1, 70, 2);
-		M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
+		M5.Lcd.setTextColor(TFT_BLACK,TFT_WHITE);
 		M5.Lcd.setTextFont(4);
 		M5.Lcd.print("Connecting");
     }
@@ -109,7 +110,7 @@ void setup()
 	color.couleur=BLANC;
 	M5.Lcd.fillScreen(WHITE);
 	M5.Lcd.setCursor(1, 70, 2);
-	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
+	M5.Lcd.setTextColor(TFT_BLACK,TFT_WHITE);
 	M5.Lcd.setTextFont(4);
 	M5.Lcd.println((String)"SSID:"+ssid);
 	M5.Lcd.print("IP:");
@@ -150,6 +151,7 @@ void phase1(void)//bouton C est le bouton de droite
 		if(color.couleur>ROUGE)//si couleur rouge on repasse au vert
 			color.couleur=VERT;
 		upd=1;
+		envoiblanc=true;
 	}
 	/*
 	Mettre la couleur sur l'ecran
@@ -242,10 +244,10 @@ void changeFreq()//change tfreq pour savoir à quelle frequenece clignoter
 void tuto()
 {
 		M5.Lcd.setCursor(30, 20, 2);
-	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
+	M5.Lcd.setTextColor(TFT_BLACK,TFT_WHITE);
 	M5.Lcd.setTextFont(4);
 	M5.Lcd.println("Blanc pas de demande");
-	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
+	M5.Lcd.setTextColor(TFT_BLACK,TFT_WHITE);
 	M5.Lcd.setCursor(225, 210, 4);
 	M5.Lcd.println("Next");
 	while(1)
@@ -259,12 +261,12 @@ void tuto()
 	pressed=false;
 	M5.Lcd.fillScreen(GREEN);
 	M5.Lcd.setCursor(60, 20, 2);
-	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
+	M5.Lcd.setTextColor(TFT_BLACK,TFT_GREEN);
 	M5.Lcd.setTextFont(4);
 	M5.Lcd.println("Vert : demande");
 	M5.Lcd.setCursor(60, 45, 4);
 	M5.Lcd.println("de verification");
-	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
+	M5.Lcd.setTextColor(TFT_BLACK,TFT_GREEN);
 	M5.Lcd.setCursor(225, 210, 4);
 	M5.Lcd.println("Next");
 	while(1)
@@ -278,12 +280,12 @@ void tuto()
 	pressed=false;
 	M5.Lcd.fillScreen(BLUE);
 	M5.Lcd.setCursor(60, 20, 2);
-	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
+	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLUE);
 	M5.Lcd.setTextFont(4);
 	M5.Lcd.println("Bleu : demande");
 	M5.Lcd.setCursor(60, 45, 4);
 	M5.Lcd.println("d'explication");
-	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
+	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLUE);
 	M5.Lcd.setCursor(225, 210, 4);
 	M5.Lcd.println("Next");
 	while(1)
@@ -297,12 +299,12 @@ void tuto()
 	pressed=false;
 	M5.Lcd.fillScreen(RED);
 	M5.Lcd.setCursor(60, 20, 2);
-	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
+	M5.Lcd.setTextColor(TFT_WHITE,TFT_RED);
 	M5.Lcd.setTextFont(4);
 	M5.Lcd.println("Rouge : demande");
 	M5.Lcd.setCursor(60, 45, 4);
 	M5.Lcd.println("d'accompagnement");
-	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
+	M5.Lcd.setTextColor(TFT_WHITE,TFT_RED);
 	M5.Lcd.setCursor(225, 210, 4);
 	M5.Lcd.println("Next");
 	while(1)
@@ -318,7 +320,7 @@ void tuto()
 
 void phase3()
 {
-	if((millis()-tattente>2000) && !sent)
+	if(((millis()-tattente>2000) && !sent)||((color.couleur==BLANC) && !sent && envoiblanc))
 	{
 		HTTPClient http;
     http.begin((String)"http://192.168.60.1/entry.php?"+"cID="+"eq45"+"&lvl="+color.couleur ); //Specify the URL
@@ -329,6 +331,8 @@ void phase3()
         String payload = http.getString();
         Serial.println(httpCode);
         Serial.println(payload);
+		sent=true;
+		envoiblanc=false;
       }
  
     else {
