@@ -243,13 +243,19 @@ void changeFreq()//change tfreq pour savoir à quelle frequenece clignoter
 
 void tuto()
 {
-		M5.Lcd.setCursor(30, 20, 2);
+	blanc:
+	M5.Lcd.fillScreen(WHITE);
+	M5.Lcd.setCursor(30, 20, 2);
 	M5.Lcd.setTextColor(TFT_BLACK,TFT_WHITE);
 	M5.Lcd.setTextFont(4);
 	M5.Lcd.println("Blanc pas de demande");
 	M5.Lcd.setTextColor(TFT_BLACK,TFT_WHITE);
 	M5.Lcd.setCursor(225, 210, 4);
 	M5.Lcd.println("Next");
+	M5.Lcd.setCursor(130, 210, 4);
+	M5.Lcd.println("Skip");
+	M5.Lcd.setCursor(35, 210, 4);
+	M5.Lcd.println("Prev");
 	while(1)
 	{
 		if(M5.BtnC.wasPressed())
@@ -257,7 +263,20 @@ void tuto()
 		M5.BtnC.read();	
 		if(M5.BtnC.wasReleased() && pressed)
 			break;
+		
+		if(M5.BtnA.wasPressed())
+			pressed=true;
+		M5.BtnA.read();	
+		if(M5.BtnA.wasReleased() && pressed)
+			goto blanc;
+		
+		if(M5.BtnB.wasPressed())
+			pressed=true;
+		M5.BtnB.read();	
+		if(M5.BtnB.wasReleased() && pressed)
+			return;
 	}
+	vert:
 	pressed=false;
 	M5.Lcd.fillScreen(GREEN);
 	M5.Lcd.setCursor(60, 20, 2);
@@ -269,6 +288,10 @@ void tuto()
 	M5.Lcd.setTextColor(TFT_BLACK,TFT_GREEN);
 	M5.Lcd.setCursor(225, 210, 4);
 	M5.Lcd.println("Next");
+	M5.Lcd.setCursor(130, 210, 4);
+	M5.Lcd.println("Skip");
+	M5.Lcd.setCursor(35, 210, 4);
+	M5.Lcd.println("Prev");
 	while(1)
 	{
 		if(M5.BtnC.wasPressed())
@@ -276,7 +299,20 @@ void tuto()
 		M5.BtnC.read();	
 		if(M5.BtnC.wasReleased() && pressed)
 			break;
+		
+		if(M5.BtnA.wasPressed())
+			pressed=true;
+		M5.BtnA.read();	
+		if(M5.BtnA.wasReleased() && pressed)
+			goto blanc;
+		
+		if(M5.BtnB.wasPressed())
+			pressed=true;
+		M5.BtnB.read();	
+		if(M5.BtnB.wasReleased() && pressed)
+			return;
 	}
+	bleu:
 	pressed=false;
 	M5.Lcd.fillScreen(BLUE);
 	M5.Lcd.setCursor(60, 20, 2);
@@ -288,6 +324,10 @@ void tuto()
 	M5.Lcd.setTextColor(TFT_WHITE,TFT_BLUE);
 	M5.Lcd.setCursor(225, 210, 4);
 	M5.Lcd.println("Next");
+	M5.Lcd.setCursor(130, 210, 4);
+	M5.Lcd.println("Skip");
+	M5.Lcd.setCursor(35, 210, 4);
+	M5.Lcd.println("Prev");
 	while(1)
 	{
 		if(M5.BtnC.wasPressed())
@@ -295,7 +335,20 @@ void tuto()
 		M5.BtnC.read();	
 		if(M5.BtnC.wasReleased() && pressed)
 			break;
+		
+		if(M5.BtnA.wasPressed())
+			pressed=true;
+		M5.BtnA.read();	
+		if(M5.BtnA.wasReleased() && pressed)
+			goto vert;
+		
+		if(M5.BtnB.wasPressed())
+			pressed=true;
+		M5.BtnB.read();	
+		if(M5.BtnB.wasReleased() && pressed)
+			return;
 	}
+	rouge:
 	pressed=false;
 	M5.Lcd.fillScreen(RED);
 	M5.Lcd.setCursor(60, 20, 2);
@@ -307,6 +360,10 @@ void tuto()
 	M5.Lcd.setTextColor(TFT_WHITE,TFT_RED);
 	M5.Lcd.setCursor(225, 210, 4);
 	M5.Lcd.println("Next");
+	M5.Lcd.setCursor(130, 210, 4);
+	M5.Lcd.println("Skip");
+	M5.Lcd.setCursor(35, 210, 4);
+	M5.Lcd.println("Prev");
 	while(1)
 	{
 		if(M5.BtnC.wasPressed())
@@ -314,7 +371,20 @@ void tuto()
 		M5.BtnC.read();	
 		if(M5.BtnC.wasReleased() && pressed)
 			break;
+		
+		if(M5.BtnA.wasPressed())
+			pressed=true;
+		M5.BtnA.read();	
+		if(M5.BtnA.wasReleased() && pressed)
+			goto bleu;
+		
+		if(M5.BtnB.wasPressed())
+			pressed=true;
+		M5.BtnB.read();	
+		if(M5.BtnB.wasReleased() && pressed)
+			return;
 	}	
+	
 	
 }
 
@@ -323,8 +393,8 @@ void phase3()
 	if(((millis()-tattente>2000) && !sent)||((color.couleur==BLANC) && !sent && envoiblanc))
 	{
 		HTTPClient http;
-    http.begin((String)"http://192.168.60.1/entry.php?"+"cID="+"eq45"+"&lvl="+color.couleur ); //Specify the URL
-    int httpCode = http.GET();                                        //Make the request
+		http.begin((String)"http://192.168.60.1/entry.php?"+"cID="+"eq45"+"&lvl="+color.couleur ); //Specify the URL
+		int httpCode = http.GET();                                        //Make the request
  
     if (httpCode > 0) { //Check for the returning code
  
