@@ -22,8 +22,8 @@ int upd=0;//pour savoir si l'ecran doit etre rafraichi
 unsigned long tattente=0;//repere dans le temps de quand on est passé au mode d'attente (couleur autre que blanche)
 unsigned long lastmillis=0;//repere dans le temps du dernier changement de icourbe
 bool pressed=false;//stocke si le bouton à été appuyé lors de la derniere boucle
-bool sent=false;
-bool envoiblanc=false;
+bool sent=false;//stocke si la requete http a été envoyé
+bool envoiblanc=false;//condition pour ne pas spammer les requetes http si l'ecran est blanc
 #define int int32_t// pour etre sûr que les int sont sur 32 bits
 //Definitions pour l'ecran
 enum{
@@ -83,38 +83,13 @@ void setup()
 	pixels.clear();
 	pixels.show();
 	tuto();
-	
-	
-	
-	
 	Serial.println();
-    Serial.println();
-    Serial.print("Connecting to ");
-    Serial.println(ssid);
-    WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-		M5.Lcd.fillScreen(WHITE);
-		M5.Lcd.setCursor(1, 70, 2);
-		M5.Lcd.setTextColor(TFT_BLACK,TFT_WHITE);
-		M5.Lcd.setTextFont(4);
-		M5.Lcd.print("Connecting");
-    }
-    Serial.println("");
-    Serial.println("WiFi connected");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
+    connectWifi();
 	
+	/*remise à zero des variables*/
 	pressed=false;
 	color.couleur=BLANC;
-	M5.Lcd.fillScreen(WHITE);
-	M5.Lcd.setCursor(1, 70, 2);
-	M5.Lcd.setTextColor(TFT_BLACK,TFT_WHITE);
-	M5.Lcd.setTextFont(4);
-	M5.Lcd.println((String)"SSID:"+ssid);
-	M5.Lcd.print("IP:");
-	M5.Lcd.println(WiFi.localIP());
+	
 }
 
 void loop()
@@ -170,7 +145,6 @@ void phase1(void)//bouton C est le bouton de droite
 	}
 }
 
-
 void initPhase2()//test de courbe
 {
 	for(int i=0;i<courbeSIZE;i++)
@@ -225,11 +199,11 @@ void afficherGraph()/*On change la couleur et la luminosité de chaque led*/
 		else
 		{
 			//Serial.println((String)"tfreq="+tfreq);
-		  pixels.setPixelColor(i, color.r, color.g, color.b);
-		  pixels.setBrightness(courbe[icourbe]);
+		  pixels.setPixelColor(i, color.r, color.g, color.b);//change la couleur du pixel d'indice i
+		  pixels.setBrightness(courbe[icourbe]);//change la luminosité des barGraph
 		}
 	}
-	pixels.show();
+	pixels.show();//envoi aux barGraph les infos de couleur et de luminositée
 }
 
 void changeFreq()//change tfreq pour savoir à quelle frequenece clignoter
@@ -262,19 +236,19 @@ void tuto()
 			pressed=true;
 		M5.BtnC.read();	
 		if(M5.BtnC.wasReleased() && pressed)
-			break;
+			break;//si bouton droite alors tuto suivant
 		
 		if(M5.BtnA.wasPressed())
 			pressed=true;
 		M5.BtnA.read();	
 		if(M5.BtnA.wasReleased() && pressed)
-			goto blanc;
+			goto blanc;//si bouton gauche aors tuto precedent
 		
 		if(M5.BtnB.wasPressed())
 			pressed=true;
 		M5.BtnB.read();	
 		if(M5.BtnB.wasReleased() && pressed)
-			return;
+			return;//si bouton milieu alors skip tuto
 	}
 	vert:
 	pressed=false;
@@ -393,13 +367,13 @@ void phase3()
 	if(((millis()-tattente>2000) && !sent)||((color.couleur==BLANC) && !sent && envoiblanc))
 	{
 		HTTPClient http;
-		http.begin((String)"http://192.168.60.1/entry.php?"+"cID="+"eq45"+"&lvl="+color.couleur ); //Specify the URL
-		int httpCode = http.GET();                                        //Make the request
+		http.begin((String)"http://192.168.60.1/entry.php?"+"cID="+"eq45"+"&lvl="+color.couleur ); //envoi une requete http au serveur avec les infos d'identification et de couleur
+		int httpCode = http.GET();                                        //envoie la requete et recupere la code http du serveur
  
-    if (httpCode > 0) { //Check for the returning code
+    if (httpCode > 0) { //Check for the returning code // si <0 alors bug dans la librarie
  
         String payload = http.getString();
-        Serial.println(httpCode);
+        Serial.println(httpCode);//devrait etre =200
         Serial.println(payload);
 		sent=true;
 		envoiblanc=false;
@@ -411,4 +385,33 @@ void phase3()
  
     http.end(); //Free the resources
 	}
+}
+
+void connectWifi()
+{
+	Serial.println();
+    Serial.print("Connecting to ");
+    Serial.println(ssid);
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+		M5.Lcd.fillScreen(WHITE);
+		M5.Lcd.setCursor(1, 70, 2);
+		M5.Lcd.setTextColor(TFT_BLACK,TFT_WHITE);
+		M5.Lcd.setTextFont(4);
+		M5.Lcd.print("Connecting");
+    }
+    Serial.println("");
+    Serial.println("WiFi connected");
+    Serial.println("IP address: ");
+    Serial.println(WiFi.localIP());
+
+	M5.Lcd.fillScreen(WHITE);
+	M5.Lcd.setCursor(1, 70, 2);
+	M5.Lcd.setTextColor(TFT_BLACK,TFT_WHITE);
+	M5.Lcd.setTextFont(4);
+	M5.Lcd.println((String)"SSID:"+ssid);
+	M5.Lcd.print("IP:");
+	M5.Lcd.println(WiFi.localIP());
 }
