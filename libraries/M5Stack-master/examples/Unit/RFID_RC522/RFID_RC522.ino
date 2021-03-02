@@ -19,7 +19,7 @@ void setup() {
   M5.Lcd.fillScreen( BLACK );
   M5.Lcd.setCursor(0, 0);
   M5.Lcd.println("M5StackFire MFRC522");
-  Serial.begin(115200);           // Initialize serial communications with the PC
+  //Serial.begin(115200);           // Initialize serial communications with the PC
   Wire.begin();                   // Initialize I2C
   
   mfrc522.PCD_Init();             // Init MFRC522

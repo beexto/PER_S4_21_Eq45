@@ -5,6 +5,10 @@ const char* password = "imsobusy";
 
 const char* host = "192.168.60.1";
 const int httpPort = 80;
+#include <Wire.h>
+#include "MFRC522_I2C.h"
+
+MFRC522 mfrc522(0x28);   // Create MFRC522 instance.
 
 #include "M5Stack.h"
 #include <Adafruit_NeoPixel.h>
@@ -24,6 +28,7 @@ unsigned long lastmillis=0;//repere dans le temps du dernier changement de icour
 bool pressed=false;//stocke si le bouton à été appuyé lors de la derniere boucle
 bool sent=false;//stocke si la requete http a été envoyé
 bool envoiblanc=false;//condition pour ne pas spammer les requetes http si l'ecran est blanc
+bool RFID=false;//condition pour ne pas passer tant que la carte n'est pas lu 
 #define int int32_t// pour etre sûr que les int sont sur 32 bits
 //Definitions pour l'ecran
 enum{
@@ -79,13 +84,25 @@ void setup()
 	M5.begin();//initialisation de l'objet M5stack -- celui qui contient les boutons
 	M5.Power.begin();//allumage des peripheriques -- les leds sur les bords
 	M5.Lcd.fillScreen(WHITE);//on remplis initialement en en blanc l'écran
+		/*RFID*/
+	mfrc522.PCD_Init();             // Init MFRC522
+	ShowReaderDetails();            // Show details of PCD - MFRC522 Card Reader details
 	//initPhase2();//rempli le tableau courbe[] avec une sin redressé
 	pixels.clear();
 	pixels.show();
 	tuto();
 	Serial.println();
+	phaseRFID(); //aquisition et traitement du RFID
+	M5.Lcd.fillScreen(WHITE);
+	M5.Lcd.setCursor(1, 70, 2);
+	M5.Lcd.setTextColor(TFT_BLACK,TFT_WHITE);
+	M5.Lcd.setTextFont(4);	
+	M5.Lcd.println("Votre carte est lu");
+	delay(200);
     connectWifi();
 	
+	
+
 	/*remise à zero des variables*/
 	pressed=false;
 	color.couleur=BLANC;
@@ -100,6 +117,7 @@ void loop()
 	phase1();//fonction de la premiere phase client
 	phase2();//fonction de la deuxieme phase client
 	phase3();
+	
 }
 
 
@@ -414,4 +432,46 @@ void connectWifi()
 	M5.Lcd.println((String)"SSID:"+ssid);
 	M5.Lcd.print("IP:");
 	M5.Lcd.println(WiFi.localIP());
+}
+
+void ShowReaderDetails() {
+  // Get the MFRC522 software version
+  byte v = mfrc522.PCD_ReadRegister(mfrc522.VersionReg);
+  Serial.print(F("MFRC522 Software Version: 0x"));
+  Serial.print(v, HEX);
+  if (v == 0x91)
+    Serial.print(F(" = v1.0"));
+  else if (v == 0x92)
+    Serial.print(F(" = v2.0"));
+  else
+    Serial.print(F(" (unknown)"));
+  Serial.println("");
+  // When 0x00 or 0xFF is returned, communication probably failed
+  if ((v == 0x00) || (v == 0xFF)) {
+    Serial.println(F("WARNING: Communication failure, is the MFRC522 properly connected?"));
+  }
+}
+
+void phaseRFID(){
+	M5.Lcd.fillScreen(WHITE);
+	M5.Lcd.setCursor(1, 70, 2);
+	M5.Lcd.setTextColor(TFT_BLACK,TFT_WHITE);
+	M5.Lcd.setTextFont(4);
+	M5.Lcd.println("Mettre votre carte etudiante");
+	M5.Lcd.setCursor(1, 110, 2);
+	M5.Lcd.setTextColor(TFT_BLACK,TFT_WHITE);
+	M5.Lcd.setTextFont(4);
+	M5.Lcd.println("sur le lecteur RFID");
+	while(1){
+	if (  mfrc522.PICC_IsNewCardPresent() ) {
+	mfrc522.PICC_ReadCardSerial();
+	Serial.println("RFID:");
+	for (byte i = 0; i < mfrc522.uid.size; i++) {
+    Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
+    Serial.print(mfrc522.uid.uidByte[i], HEX);
+		}
+	break;
+	}
+		
+	}
 }
