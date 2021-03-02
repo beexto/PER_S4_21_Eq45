@@ -1,0 +1,46 @@
+DDC
+	1 conception preliminaire
+		-verifier que le cdc est tenable
+		-trouver les solution techniques
+		-a faire pour chaque phase
+	11 solution elec (toutes les phases)
+		-acquisition traitement action energie
+	12 solution elec (toutes les phases)
+		-acquisition traitement action energie(N/A)
+		-prototype de fonction
+	13 solution meca
+		-fusion 360
+		
+	2 conception detaillée
+	21 phase 1
+		-client demande ça --> on met ça
+		1A rappel du CDC
+		1B les solutions elec
+		1C les solution logicielles
+		1D les solution meca
+	2etc ... (à repeter pour chaque phase)
+	
+	3 conclusion
+		-conformité du produit
+		-tableau de conformité
+		
+DDF
+	1 schéma elec
+		-branchement au pc et rfid
+		-serveur en wifi
+	2 les achats (nomenclature)
+		-serveur 
+		-rfid
+		-m5 stack
+		-cable usb
+	3 code informatique
+		-pas en image
+		
+DDV (travail par phase)
+	imaginer des protocoles de verification
+	1 phase 1
+		1A le cahier des charges
+		1B le matos utilisé
+		1C la procedure
+			-avec les attendus
+		1D conformité
