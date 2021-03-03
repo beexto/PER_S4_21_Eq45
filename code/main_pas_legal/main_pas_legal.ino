@@ -5,10 +5,12 @@ const char* password = "imsobusy";
 
 const char* host = "192.168.60.1";
 const int httpPort = 80;
+#define RFID 0
+#if RFID
 #include <Wire.h>
 #include "MFRC522_I2C.h"
-
 MFRC522 mfrc522(0x28);   // Create MFRC522 instance.
+#endif
 
 #include "M5Stack.h"
 #include <Adafruit_NeoPixel.h>
@@ -28,7 +30,7 @@ unsigned long lastmillis=0;//repere dans le temps du dernier changement de icour
 bool pressed=false;//stocke si le bouton à été appuyé lors de la derniere boucle
 bool sent=false;//stocke si la requete http a été envoyé
 bool envoiblanc=false;//condition pour ne pas spammer les requetes http si l'ecran est blanc
-bool RFID=false;//condition pour ne pas passer tant que la carte n'est pas lu 
+//bool rfid=false;//condition pour ne pas passer tant que la carte n'est pas lu 
 #define int int32_t// pour etre sûr que les int sont sur 32 bits
 //Definitions pour l'ecran
 enum{
@@ -85,13 +87,18 @@ void setup()
 	M5.Power.begin();//allumage des peripheriques -- les leds sur les bords
 	M5.Lcd.fillScreen(WHITE);//on remplis initialement en en blanc l'écran
 		/*RFID*/
+		Serial.println("init pcd");
+	#if RFID	
 	mfrc522.PCD_Init();             // Init MFRC522
-	ShowReaderDetails();            // Show details of PCD - MFRC522 Card Reader details
+	Serial.println("init rfid");
+	ShowReaderDetails();  
+	#endif	// Show details of PCD - MFRC522 Card Reader details
 	//initPhase2();//rempli le tableau courbe[] avec une sin redressé
 	pixels.clear();
 	pixels.show();
 	tuto();
 	Serial.println();
+	#if RFID
 	phaseRFID(); //aquisition et traitement du RFID
 	M5.Lcd.fillScreen(WHITE);
 	M5.Lcd.setCursor(1, 70, 2);
@@ -99,6 +106,7 @@ void setup()
 	M5.Lcd.setTextFont(4);	
 	M5.Lcd.println("Votre carte est lu");
 	delay(200);
+	#endif
     connectWifi();
 	
 	
@@ -433,7 +441,7 @@ void connectWifi()
 	M5.Lcd.print("IP:");
 	M5.Lcd.println(WiFi.localIP());
 }
-
+#if RFID
 void ShowReaderDetails() {
   // Get the MFRC522 software version
   byte v = mfrc522.PCD_ReadRegister(mfrc522.VersionReg);
@@ -451,6 +459,7 @@ void ShowReaderDetails() {
     Serial.println(F("WARNING: Communication failure, is the MFRC522 properly connected?"));
   }
 }
+
 
 void phaseRFID(){
 	M5.Lcd.fillScreen(WHITE);
@@ -475,3 +484,4 @@ void phaseRFID(){
 		
 	}
 }
+#endif
