@@ -3,9 +3,9 @@
 const char* ssid     = "BusyLight";
 const char* password = "imsobusy";
 
-const char* host = "192.168.60.1";
-const int httpPort = 80;
-#define RFID 0
+const char* host = "192.168.60.1";//l'adresse de la Rpi
+const int httpPort = 80;//le port de la requete
+#define RFID 0 // permet d'indiquer avant la compilation si un module RFID est present --> reduit la taille du sketch et le temps de compilation
 #if RFID
 #include <Wire.h>
 #include "MFRC522_I2C.h"
@@ -18,7 +18,7 @@ MFRC522 mfrc522(0x28);   // Create MFRC522 instance.
 #define M5STACK_FIRE_NEO_DATA_PIN 15
 #define courbeSIZE 50
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(M5STACK_FIRE_NEO_NUM_LEDS, M5STACK_FIRE_NEO_DATA_PIN, NEO_GRB + NEO_KHZ800);
-int lum=0;
+int lum=0;// variable pour la luminosité des leds
 //int freq[6]={30,30,20,15,10,125};
 int freq[6]={0,2000,1000,500,250,125};// les frequences à suivre
 int tfreq=0;//periode à laquelle on doit clignoter
@@ -91,12 +91,12 @@ void setup()
 	#if RFID	
 	mfrc522.PCD_Init();             // Init MFRC522
 	Serial.println("init rfid");
-	ShowReaderDetails();  
+	ShowReaderDetails();  //montre la version du lecteur RFID
 	#endif	// Show details of PCD - MFRC522 Card Reader details
-	//initPhase2();//rempli le tableau courbe[] avec une sin redressé
-	pixels.clear();
+	//initPhase2();//rempli le tableau courbe[] avec une sin redressé POUR TEST
+	pixels.clear();//on eteint toutes les leds
 	pixels.show();
-	tuto();
+	tuto();//fonction à machine d'état pour montrer l'utilisation de l'appareil
 	Serial.println();
 	#if RFID
 	phaseRFID(); //aquisition et traitement du RFID
@@ -107,7 +107,7 @@ void setup()
 	M5.Lcd.println("Votre carte est lu");
 	delay(200);
 	#endif
-    connectWifi();
+    connectWifi();// essai de se connecter au wifi PAS DE TIMEOUT
 	
 	
 
@@ -471,16 +471,18 @@ void phaseRFID(){
 	M5.Lcd.setTextColor(TFT_BLACK,TFT_WHITE);
 	M5.Lcd.setTextFont(4);
 	M5.Lcd.println("sur le lecteur RFID");
-	while(1){
-	if (  mfrc522.PICC_IsNewCardPresent() ) {
-	mfrc522.PICC_ReadCardSerial();
-	Serial.println("RFID:");
-	for (byte i = 0; i < mfrc522.uid.size; i++) {
-    Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
-    Serial.print(mfrc522.uid.uidByte[i], HEX);
+	while(1)
+	{
+		if (  mfrc522.PICC_IsNewCardPresent() ) //si carte detecté
+		{
+			mfrc522.PICC_ReadCardSerial();//lecture de la carte
+			Serial.println("RFID:");
+			for (byte i = 0; i < mfrc522.uid.size; i++) { // envoi de la carte sur le port série
+			Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
+			Serial.print(mfrc522.uid.uidByte[i], HEX);
+				}
+			break;
 		}
-	break;
-	}
 		
 	}
 }
