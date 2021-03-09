@@ -5,11 +5,12 @@ const char* password = "imsobusy";
 
 const char* host = "192.168.60.1";//l'adresse de la Rpi
 const int httpPort = 80;//le port de la requete
-#define RFID 0 // permet d'indiquer avant la compilation si un module RFID est present --> reduit la taille du sketch et le temps de compilation
+#define RFID 1 // permet d'indiquer avant la compilation si un module RFID est present --> reduit la taille du sketch et le temps de compilation
 #if RFID
 #include <Wire.h>
 #include "MFRC522_I2C.h"
 MFRC522 mfrc522(0x28);   // Create MFRC522 instance.
+char ID[14];
 #endif
 
 #include "M5Stack.h"
@@ -124,7 +125,7 @@ void loop()
 	M5.Speaker.update();
 	phase1();//fonction de la premiere phase client
 	phase2();//fonction de la deuxieme phase client
-	phase3();
+	phase3();//fonction de la troisieme phase client
 	
 }
 
@@ -392,8 +393,9 @@ void phase3()
 {
 	if(((millis()-tattente>2000) && !sent)||((color.couleur==BLANC) && !sent && envoiblanc))
 	{
+		
 		HTTPClient http;
-		http.begin((String)"http://192.168.60.1/entry.php?"+"cID="+"eq45"+"&lvl="+color.couleur ); //envoi une requete http au serveur avec les infos d'identification et de couleur
+		http.begin((String)"http://192.168.60.1/entry.php?"+"cID="+ID+"&lvl="+color.couleur ); //envoi une requete http au serveur avec les infos d'identification et de couleur
 		int httpCode = http.GET();                                        //envoie la requete et recupere la code http du serveur
  
     if (httpCode > 0) { //Check for the returning code // si <0 alors bug dans la librarie
@@ -481,6 +483,9 @@ void phaseRFID(){
 			Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
 			Serial.print(mfrc522.uid.uidByte[i], HEX);
 				}
+				Serial.println();
+			sprintf(ID,"%02X%02X%02X%02X%02X%02X%02X",mfrc522.uid.uidByte[0],mfrc522.uid.uidByte[1],mfrc522.uid.uidByte[2],mfrc522.uid.uidByte[3],mfrc522.uid.uidByte[4],mfrc522.uid.uidByte[5],mfrc522.uid.uidByte[6]);
+			Serial.println(ID);
 			break;
 		}
 		
