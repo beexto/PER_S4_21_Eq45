@@ -5,7 +5,7 @@ DDC
 		-a faire pour chaque phase
 	11 solution elec (toutes les phases)
 		-acquisition traitement action energie
-	12 solution elec (toutes les phases)
+	12 solution info (toutes les phases)
 		-acquisition traitement action energie(N/A)
 		-prototype de fonction
 	13 solution meca
