@@ -5,18 +5,19 @@ const char *password = "imsobusy";
 
 const char *host = "192.168.60.1"; //l'adresse de la Rpi
 const int httpPort = 80;		   //le port de la requete
-#define RFID 0					   // permet d'indiquer avant la compilation si un module RFID est present --> reduit la taille du sketch et le temps de compilation
+#define RFID 0					   // permet d'indiquer avant la compilation si un module RFID est present 
+								//--> reduit la taille du sketch et le temps de compilation
 #if RFID
 #include <Wire.h>
 #include "MFRC522_I2C.h"
 MFRC522 mfrc522(0x28); // Create MFRC522 instance.
 
 #endif
-char ID[14];
+char ID[14]={"-1"};
 #include "M5Stack.h"
 #include <Adafruit_NeoPixel.h>
-#define M5STACK_FIRE_NEO_NUM_LEDS 10
-#define M5STACK_FIRE_NEO_DATA_PIN 15
+#define M5STACK_FIRE_NEO_NUM_LEDS 10 //le nombre de led
+#define M5STACK_FIRE_NEO_DATA_PIN 15 //le pin data pour les leds
 #define courbeSIZE 50
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(M5STACK_FIRE_NEO_NUM_LEDS, M5STACK_FIRE_NEO_DATA_PIN, NEO_GRB + NEO_KHZ800);
 int lum = 0; // variable pour la luminosité des leds
