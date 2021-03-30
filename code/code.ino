@@ -107,7 +107,7 @@ void setup()
 	M5.Lcd.setCursor(1, 70, 2);
 	M5.Lcd.setTextColor(TFT_BLACK, TFT_WHITE);
 	M5.Lcd.setTextFont(4);
-	M5.Lcd.println("Votre carte est lu");
+	M5.Lcd.println("Votre carte est lue");
 	delay(200);
 #endif
 	connectWifi(); // essai de se connecter au wifi PAS DE TIMEOUT--> bloquant
