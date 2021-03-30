@@ -5,15 +5,15 @@ const char *password = "imsobusy";
 
 const char *host = "192.168.60.1"; //l'adresse de la Rpi
 const int httpPort = 80;		   //le port de la requete
-#define RFID 0					   // permet d'indiquer avant la compilation si un module RFID est present 
-								//--> reduit la taille du sketch et le temps de compilation
+#define RFID 1					   // permet d'indiquer avant la compilation si un module RFID est present \
+								   //--> reduit la taille du sketch et le temps de compilation
 #if RFID
 #include <Wire.h>
 #include "MFRC522_I2C.h"
 MFRC522 mfrc522(0x28); // Create MFRC522 instance.
 
 #endif
-char ID[14]={"-1"};
+char ID[14] = {"-1"};
 #include "M5Stack.h"
 #include <Adafruit_NeoPixel.h>
 #define M5STACK_FIRE_NEO_NUM_LEDS 10 //le nombre de led
@@ -50,7 +50,7 @@ public:
 	int g = 0;
 	int b = 0;
 
-	void updateRGB()//mets à jour le code RGB de color en fonction de la couleur actuelle
+	void updateRGB() //mets à jour le code RGB de color en fonction de la couleur actuelle
 	{
 		switch (couleur)
 		{
@@ -98,8 +98,8 @@ void setup()
 #endif
 	//initPhase2();//rempli le tableau courbe[] avec une sin redressé POUR TEST
 	pixels.clear(); //on eteint toutes les leds
-	pixels.show();//on envoi l'info aux leds
-	tuto(); //fonction à machine d'état pour montrer l'utilisation de l'appareil
+	pixels.show();	//on envoi l'info aux leds
+	tuto();			//fonction à machine d'état pour montrer l'utilisation de l'appareil
 	Serial.println();
 #if RFID
 	phaseRFID(); //aquisition et traitement du RFID
@@ -121,9 +121,24 @@ void loop()
 {
 	//Serial.println("loop");
 	M5.BtnC.read(); //lecture de l'état des boutons
-	phase1(); //fonction de la premiere phase client
-	phase2(); //fonction de la deuxieme phase client
-	phase3(); //fonction de la troisieme phase client
+	phase1();		//fonction de la premiere phase client
+	phase2();		//fonction de la deuxieme phase client
+	phase3();		//fonction de la troisieme phase client
+
+	if (mfrc522.PICC_IsNewCardPresent()) //si carte detecté
+	{
+		mfrc522.PICC_ReadCardSerial(); //lecture de la carte
+		Serial.println("RFID:");
+		for (byte i = 0; i < mfrc522.uid.size; i++)
+		{ // envoi de la carte sur le port série
+			Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
+			Serial.print(mfrc522.uid.uidByte[i], HEX);
+		}
+		Serial.println();
+		/*ecriture de l'UID dans la variable ID -- %02X correspond a un HEX + un 0 si le HEX est inferieur à 10*/
+		sprintf(ID, "%02X%02X%02X%02X%02X%02X%02X", mfrc522.uid.uidByte[0], mfrc522.uid.uidByte[1], mfrc522.uid.uidByte[2], mfrc522.uid.uidByte[3], mfrc522.uid.uidByte[4], mfrc522.uid.uidByte[5], mfrc522.uid.uidByte[6]);
+		Serial.println(ID);
+	}
 }
 
 void phase1(void) //bouton C est le bouton de droite
@@ -139,7 +154,7 @@ void phase1(void) //bouton C est le bouton de droite
 	else if (M5.BtnC.pressedFor(1000)) //test appuis long
 	{
 		color.couleur = BLANC;
-		upd = 1;//l'ecran doit etre changé de couleur
+		upd = 1; //l'ecran doit etre changé de couleur
 		pressed = false;
 	}
 	if (M5.BtnC.wasReleased() && pressed)
@@ -148,28 +163,53 @@ void phase1(void) //bouton C est le bouton de droite
 		color.couleur++;
 		if (color.couleur > ROUGE) //si couleur rouge on repasse au vert
 			color.couleur = VERT;
-		upd = 1;//l'ecran doit etre changé de couleur
-		envoiblanc = true;//pour savoir qu'il faut envoyer l'info de remise à zero au serveur
+		upd = 1;		   //l'ecran doit etre changé de couleur
+		envoiblanc = true; //pour savoir qu'il faut envoyer l'info de remise à zero au serveur
 	}
 	/*
 	Mettre la couleur sur l'ecran
 	*/
 	if (upd == 1)
 	{
-		sent = false;//pour savoir qu'il faut envoyer l'info de couleur au serveur
+		sent = false; //pour savoir qu'il faut envoyer l'info de couleur au serveur
 		switch (color.couleur)
 		{
 		case BLANC:
 			M5.Lcd.fillScreen(WHITE);
+			M5.Lcd.setCursor(30, 20, 2);
+			M5.Lcd.setTextColor(TFT_BLACK, TFT_WHITE);
+			M5.Lcd.setTextFont(4);
+			M5.Lcd.println("Blanc pas de demande");
+			M5.Lcd.setTextColor(TFT_BLACK, TFT_WHITE);
 			break;
 		case VERT:
 			M5.Lcd.fillScreen(GREEN);
+			M5.Lcd.setCursor(60, 20, 2);
+			M5.Lcd.setTextColor(TFT_BLACK, TFT_GREEN);
+			M5.Lcd.setTextFont(4);
+			M5.Lcd.println("Vert : demande");
+			M5.Lcd.setCursor(60, 45, 4);
+			M5.Lcd.println("de verification");
 			break;
 		case BLEU:
 			M5.Lcd.fillScreen(BLUE);
+			M5.Lcd.setCursor(60, 20, 2);
+			M5.Lcd.setTextColor(TFT_WHITE, TFT_BLUE);
+			M5.Lcd.setTextFont(4);
+			M5.Lcd.println("Bleu : demande");
+			M5.Lcd.setCursor(60, 45, 4);
+			M5.Lcd.println("d'explication");
+			M5.Lcd.setTextColor(TFT_WHITE, TFT_BLUE);
 			break;
 		case ROUGE:
 			M5.Lcd.fillScreen(RED);
+			M5.Lcd.setCursor(60, 20, 2);
+			M5.Lcd.setTextColor(TFT_WHITE, TFT_RED);
+			M5.Lcd.setTextFont(4);
+			M5.Lcd.println("Rouge : demande");
+			M5.Lcd.setCursor(60, 45, 4);
+			M5.Lcd.println("d'accompagnement");
+			M5.Lcd.setTextColor(TFT_WHITE, TFT_RED);
 			break;
 		default:
 			break;
@@ -188,7 +228,7 @@ void initPhase2() //test de courbe PAS UTILISé
 
 void phase2() //active toutes les fonctions de la phase 2
 {
-	if (color.couleur == BLANC)//si ecran blanc alors pas en attente
+	if (color.couleur == BLANC) //si ecran blanc alors pas en attente
 	{
 		//Serial.println("BLANC");
 		/*On mets a jour les repere au temps actuel*/
@@ -213,7 +253,7 @@ void icourbeChang() //fait clignoter les bargraph //le min cest 2ms par boucle a
 		//Serial.println((String)"T="+(millis()-lastmillis)+"--tfreq/courbeSIZE="+(tfreq/courbeSIZE));//pour voir le temps voulu VS temps réel
 
 		lastmillis = millis();
-		if (icourbe > courbeSIZE-1) //remise à zero de icourbe si au bout de courbe[]
+		if (icourbe > courbeSIZE - 1) //remise à zero de icourbe si au bout de courbe[]
 			icourbe = 0;
 	}
 }
@@ -227,7 +267,7 @@ void afficherGraph() /*On change la couleur et la luminosité de chaque led*/
 		if (tfreq == 0)
 		{
 			//Serial.println((String)"tfreq=0");
-			pixels.clear();//on eteint les leds
+			pixels.clear(); //on eteint les leds
 		}
 		else
 		{
@@ -241,9 +281,9 @@ void afficherGraph() /*On change la couleur et la luminosité de chaque led*/
 
 void changeFreq() //change tfreq pour savoir à quelle frequenece clignoter
 {
-	int a = (int)((millis() - tattente) / 60000);//compte les minutes depuis tattente
+	int a = (int)((millis() - tattente) / 60000); //compte les minutes depuis tattente
 
-	if (a > 5)//si superieur à 5min pas d'augmentation de fréquence
+	if (a > 5) //si superieur à 5min pas d'augmentation de fréquence
 		a = 5;
 	tfreq = freq[a];
 }
@@ -396,11 +436,11 @@ rouge:
 void phase3()
 {
 	if (((millis() - tattente > 2000) && !sent) || ((color.couleur == BLANC) && !sent && envoiblanc))
-	{//si (attente de puis 2 min et pas encore envoyé) OU (la couleur blanche vient d'etre affiché sur l'ecran)
+	{ //si (attente de puis 2 min et pas encore envoyé) OU (la couleur blanche vient d'etre affiché sur l'ecran)
 
 		HTTPClient http;
 		http.begin((String) "http://192.168.60.1/entry.php?" + "cID=" + ID + "&lvl=" + color.couleur); //envoi une requete http au serveur avec les infos d'identification et de couleur
-		int httpCode = http.GET();//envoie la requete et recupere la code http du serveur
+		int httpCode = http.GET();																	   //envoie la requete et recupere la code http du serveur
 
 		if (httpCode > 0)
 		{ //Check for the returning code // si <0 alors bug dans notre code
@@ -428,8 +468,8 @@ void connectWifi()
 	Serial.print("Connecting to ");
 	Serial.println(ssid);
 	WiFi.begin(ssid, password);
-	while (WiFi.status() != WL_CONNECTED)//essaye en boucle de se connecter au wifi
-	{//animation sur le port série
+	while (WiFi.status() != WL_CONNECTED) //essaye en boucle de se connecter au wifi
+	{									  //animation sur le port série
 		delay(200);
 		Serial.print(".");
 		M5.Lcd.fillScreen(WHITE);
@@ -449,7 +489,7 @@ void connectWifi()
 	M5.Lcd.setTextFont(4);
 	M5.Lcd.println((String) "SSID:" + ssid);
 	M5.Lcd.print("IP:");
-	M5.Lcd.println(WiFi.localIP());//on affiche l'ip sur l'ecran
+	M5.Lcd.println(WiFi.localIP()); //on affiche l'ip sur l'ecran
 }
 #if RFID
 void ShowReaderDetails()
